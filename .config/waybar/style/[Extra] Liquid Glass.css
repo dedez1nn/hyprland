@@ -1,0 +1,242 @@
+/* ================================================
+   [Extra] Liquid Glass.css
+   Inspirado em Apple iOS 26 / macOS Tahoe
+   O blur vem do compositor Hyprland (layerrule),
+   não do CSS — GTK3 não suporta backdrop-filter.
+   ================================================ */
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-weight: 500;
+    font-size: 13px;
+    min-height: 0;
+    border: none;
+    background-color: transparent;
+}
+
+/* ---- BARRA ÚNICA (glass pill) ---- */
+
+window#waybar {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+window#waybar.hidden {
+    opacity: 0.15;
+}
+
+/* ---- GLASS PILLS individuais ---- */
+.modules-left,
+.modules-center,
+.modules-right {
+    background-color: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 22px;
+    margin: 6px 4px;
+    padding: 5px 10px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.50),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.10),
+        0 8px 24px rgba(0, 0, 0, 0.35),
+        0 2px 8px rgba(0, 0, 0, 0.20);
+}
+
+.modules-center {
+    background-color: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---- WORKSPACES ---- */
+
+#workspaces {
+    padding: 0 2px;
+}
+
+#workspaces button {
+    color: rgba(255, 255, 255, 0.45);
+    border-radius: 14px;
+    padding: 2px 8px;
+    margin: 2px 1px;
+    min-width: 22px;
+    transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: none;
+    text-shadow: none;
+}
+
+#workspaces button.active {
+    color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    border-radius: 14px;
+    padding: 2px 12px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.20);
+    transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#workspaces button:hover {
+    color: rgba(255, 255, 255, 0.80);
+    background-color: rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    transition: all 0.20s ease;
+}
+
+#workspaces button.urgent {
+    color: rgba(255, 100, 100, 0.95);
+    background-color: rgba(255, 80, 80, 0.15);
+    border: 1px solid rgba(255, 100, 100, 0.28);
+}
+
+/* ---- WINDOW TITLE ---- */
+
+#window {
+    color: rgba(255, 255, 255, 0.50);
+    font-size: 12px;
+    padding: 0 8px;
+}
+
+window#waybar.empty #window {
+    padding: 0;
+}
+
+/* ---- CLIMA ---- */
+
+#custom-weather {
+    color: rgba(255, 255, 255, 0.80);
+    padding: 0 8px 0 4px;
+}
+
+/* ---- CLOCK ---- */
+
+#clock {
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0 8px;
+}
+
+/* ---- BRILHO ---- */
+
+#backlight {
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0 6px;
+}
+
+/* ---- MÓDULOS (base comum) ---- */
+
+#cpu,
+#memory,
+#network,
+#pulseaudio,
+#temperature,
+#battery,
+#bluetooth,
+#disk,
+#idle_inhibitor,
+#tray,
+#mpris {
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0 6px;
+}
+
+/* ---- NETWORK ---- */
+
+#network.disconnected {
+    color: rgba(255, 100, 100, 0.85);
+}
+
+/* ---- BATTERY ---- */
+
+#battery.good,
+#battery.warning,
+#battery.critical:not(.charging) {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- TRAY ---- */
+
+#tray {
+    padding: 0 4px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+/* ---- NOTIFICATIONS (swaync) ---- */
+
+#custom-swaync,
+#custom-swaync.notification,
+#custom-swaync.dnd {
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0 6px;
+}
+
+/* ---- UPDATES ---- */
+
+#custom-updates {
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0 6px;
+}
+
+#custom-updates.pending {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+#custom-updates.updated {
+    color: rgba(255, 255, 255, 0.40);
+}
+
+/* ---- WALLPAPER ---- */
+
+#custom-cycle_wall {
+    color: rgba(255, 255, 255, 0.60);
+    padding: 0 6px;
+}
+
+#custom-cycle_wall:hover {
+    color: rgba(255, 255, 255, 0.90);
+}
+
+/* ---- POWER ---- */
+
+#custom-power {
+    color: rgba(255, 255, 255, 0.75);
+    padding: 0 6px 0 4px;
+}
+
+/* ---- IDLE INHIBITOR ---- */
+
+#idle_inhibitor.activated {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- TOOLTIPS ---- */
+
+tooltip {
+    background-color: rgba(20, 22, 30, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 16px;
+    padding: 6px 10px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+tooltip label {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+/* ---- ANIMAÇÕES ---- */
+
+@keyframes blink {
+    to {
+        color: rgba(255, 255, 255, 0.25);
+    }
+}

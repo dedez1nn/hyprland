@@ -1,0 +1,22 @@
+# Cache e temporários
+*.cache
+*.log
+__pycache__/
+*.pyc
+.current_wallpaper
+
+# Wallust cache gerado automaticamente
+.config/wallust/cache/
+
+# Arquivos gerados pelo wallust (sobrescritos automaticamente)
+.config/waybar/wallust/
+.config/rofi/wallust/
+.config/kitty/kitty-themes/01-Wallust.conf
+.config/hypr/wallust/wallust-hyprland.conf
+
+# Arquivos pessoais
+.config/hypr/wallpaper_effects/
+.config/hypr/.initial_startup_done
+
+# Quickshell state
+.config/quickshell/GlobalStates.qml

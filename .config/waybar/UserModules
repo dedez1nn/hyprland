@@ -1,0 +1,20 @@
+//* ---- 💫 https://github.com/JaKooLit 💫 ---- *//
+/* Waybar Modules Extras */
+
+/* This is where you can add Extra Modules you wish. copy.sh will try to restore*/
+/* this file along with the unique configs and styles. */
+/* IMPORTANT, be mindful with , or ". else waybar will not start */
+
+{
+
+"custom/updates": {
+    "exec": "$HOME/.config/hypr/UserScripts/CheckUpdates.sh",
+    "return-type": "json",
+    "interval": 3600,
+    "exec-on-event": true,
+    "tooltip": true,
+    "on-click": "kitty --title 'System Update' yay -Syu",
+    "on-click-right": "$HOME/.config/hypr/UserScripts/CheckUpdates.sh"
+}
+
+}
