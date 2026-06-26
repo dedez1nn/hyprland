@@ -1,184 +1,293 @@
-# Hyprland Dotfiles
+# Hyprland Liquid Glass Dotfiles
 
-A clean, minimal Hyprland setup with a Liquid Glass-inspired Waybar, dark terminal, and automatic theming via wallust.
+Setup pessoal do Hyprland com estética Liquid Glass, Waybar customizada, temas automáticos via wallust e módulos próprios (apolo, ProtonVPN, qualidade de conexão).
 
-> Based on [JaKooLit's Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots) — customized with personal aesthetic tweaks.
+> Baseado em [JaKooLit/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots) com customizações visuais e de workflow.
 
 ---
 
 ## Preview
 
-> Replace with your own screenshots
-
-| Waybar + Workspaces | Lock Screen | Keybind Cheatsheet |
-|---|---|---|
-| *(screenshot)* | *(screenshot)* | *(screenshot)* |
+| Waybar + Workspaces | Lock Screen |
+|---|---|
+| *(screenshot)* | *(screenshot)* |
 
 ---
 
-## Requirements
+## Qual é o seu caso?
 
-Install these packages before copying the configs. On Arch Linux:
+Escolha o caminho de instalação:
+
+- **[Já uso o JaKooLit Hyprland-Dots](#caso-a--já-uso-o-jakoolit-hyprland-dots)** — o mais rápido, sobrescreve só os arquivos customizados
+- **[Hyprland limpo / outra base](#caso-b--hyprland-limpo-ou-outra-base)** — instala tudo do zero com o `install.sh`
+
+---
+
+## Caso A — Já uso o JaKooLit Hyprland-Dots
+
+Se você já tem o setup do JaKooLit rodando, você só precisa sobrescrever os arquivos que foram customizados aqui. Sem instalar dependências extras.
 
 ```bash
-# Core
+git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+```
+
+### 1. Waybar — layout e estilo
+
+```bash
+# Layout ativo
+cp ".config/waybar/configs/[TOP] Andre Liquid Glass" \
+   ~/.config/waybar/configs/
+
+# Estilo Liquid Glass
+cp ".config/waybar/style/[Extra] Liquid Glass.css" \
+   ~/.config/waybar/style/
+
+# Módulos customizados (apolo, ProtonVPN, keybinds, connection quality)
+cp .config/waybar/UserModules ~/.config/waybar/UserModules
+
+# Scripts da Waybar
+cp .config/waybar/apolo-review.sh \
+   .config/waybar/protonvpn-status.sh \
+   .config/waybar/protonvpn-toggle.sh \
+   .config/waybar/connection-quality.sh \
+   .config/waybar/bluetooth-toggle.sh \
+   ~/.config/waybar/
+chmod +x ~/.config/waybar/*.sh
+
+# Imagem do módulo apolo
+cp .config/waybar/apolo.png ~/.config/waybar/
+
+# Apontar o symlink de estilo para o Liquid Glass
+ln -sfn ~/.config/waybar/style/[Extra]\ Liquid\ Glass.css ~/.config/waybar/style.css
+ln -sfn ~/.config/waybar/configs/[TOP]\ Andre\ Liquid\ Glass ~/.config/waybar/config
+```
+
+### 2. Hypr — configs de usuário
+
+```bash
+cp -r .config/hypr/UserConfigs/. ~/.config/hypr/UserConfigs/
+cp -r .config/hypr/UserScripts/. ~/.config/hypr/UserScripts/
+cp .config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf
+cp .config/hypr/hypridle.conf ~/.config/hypr/hypridle.conf
+```
+
+### 3. Corrigir paths (substitui HOME_PLACEHOLDER pelo seu $HOME)
+
+```bash
+sed -i "s|HOME_PLACEHOLDER|$HOME|g" ~/.config/hypr/hyprlock.conf
+sed -i "s|HOME_PLACEHOLDER|$HOME|g" ~/.config/waybar/style/[Extra]\ Liquid\ Glass.css
+```
+
+### 4. Wallpapers
+
+```bash
+mkdir -p ~/Imagens/wallpapers
+cp wallpapers/*.jpg ~/Imagens/wallpapers/
+```
+
+Depois defina o wallpaper padrão editando `~/.config/hypr/hyprpaper.conf`.
+
+### 5. Terminal, notificações, logout
+
+Copie só o que quiser substituir:
+
+```bash
+# Kitty
+cp -r .config/kitty/. ~/.config/kitty/
+
+# Ghostty
+cp .config/ghostty/config ~/.config/ghostty/config
+
+# Swaync (notificações)
+cp -r .config/swaync/. ~/.config/swaync/
+
+# Wlogout (menu de saída)
+cp -r .config/wlogout/. ~/.config/wlogout/
+
+# btop
+cp .config/btop/btop.conf ~/.config/btop/btop.conf
+```
+
+Reinicie a Waybar: `pkill waybar && waybar &`
+
+---
+
+## Caso B — Hyprland limpo ou outra base
+
+### 1. Dependências
+
+```bash
+# Core Hyprland
 sudo pacman -S hyprland hyprlock hypridle hyprpaper
 
-# Waybar & notifications
+# Waybar e notificações
 sudo pacman -S waybar swaync
 
-# Terminal & launcher
-sudo pacman -S kitty rofi-wayland
+# Terminal, launcher, gerenciador de arquivos
+sudo pacman -S kitty ghostty rofi-wayland thunar
 
-# File manager & utilities
-sudo pacman -S thunar wlogout
+# Menu de saída e barra de sessão
+sudo pacman -S wlogout nwg-bar
 
 # Wallpaper daemon
-# Option A — if swww is available in your repos:
+# Opção A — pacman:
 sudo pacman -S swww
-# Option B — AUR (awww):
+# Opção B — AUR (awww, substituto do swww):
 yay -S awww
-# If using awww, create the symlinks:
 sudo ln -sf /usr/bin/awww /usr/local/bin/swww
 sudo ln -sf /usr/bin/awww-daemon /usr/local/bin/swww-daemon
 
-# Theming
+# Theming automático
 yay -S wallust
 
 # Screenshots
 sudo pacman -S grim slurp swappy
 
-# Python (for weather widget)
+# Python (widget de clima)
 sudo pacman -S python python-requests
 
-# Font — REQUIRED for icons to render
-sudo pacman -S ttf-jetbrains-mono-nerd
+# Fontes — obrigatório para os ícones
+sudo pacman -S ttf-jetbrains-mono-nerd ttf-fantasque-nerd
 
-# Optional extras
-sudo pacman -S fastfetch cava bat
+# Extras opcionais
+sudo pacman -S fastfetch cava bat lsd fzf
 ```
 
----
-
-## Installation
-
-> **Warning:** This will overwrite files in `~/.config`. Back up your existing configs first.
+### 2. Instalar
 
 ```bash
-# 1. Clone
 git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/dotfiles
-
-# 2. Copy configs
-cp -r ~/dotfiles/.config/* ~/.config/
-
-# 3. Copy shell config (optional)
-cp ~/dotfiles/.zshrc ~/   # only if you also use oh-my-zsh + agnosterzak
+cd ~/dotfiles
+bash install.sh
 ```
 
-After copying, log out and log back into Hyprland.
+O script faz backup dos configs existentes, copia tudo, corrige os paths e cria os symlinks necessários.
+
+### 3. Shell (opcional)
+
+O `.zshrc` usa **oh-my-zsh** com o tema `agnosterzak`. Para instalar:
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Plugins
+git clone https://github.com/zsh-users/zsh-autosuggestions \
+  ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting \
+  ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+
+# Tema agnosterzak
+curl -o ~/.oh-my-zsh/custom/themes/agnosterzak.zsh-theme \
+  https://raw.githubusercontent.com/zakaziko99/agnosterzak-ohmyzsh-theme/master/agnosterzak.zsh-theme
+```
 
 ---
 
-## Post-install Setup
+## Configuração pós-instalação
 
-### Wallpaper
+### Widget de clima
 
-Place your wallpaper at:
-
-```
-~/Pictures/wallpapers/wallpaper.jpg
-```
-
-The wallpaper button on Waybar (right side) lets you browse and apply wallpapers from that folder. A random one can also be applied with `CTRL + ALT + W`.
-
-After applying a wallpaper, **wallust** automatically regenerates the color scheme for Kitty, Waybar, and other components.
-
-### Weather Widget
-
-The weather widget on Waybar's center bar is pre-configured for **Passos, MG, Brazil**.
-
-To change it to your location, edit `~/.config/hypr/UserScripts/Weather.py`:
+O widget está configurado para **Passos, MG**. Para mudar:
 
 ```python
-MANUAL_PLACE: Optional[str] = "Your City, Your State"
-MANUAL_LAT: Optional[float] = -00.0000   # your latitude
-MANUAL_LON: Optional[float] = -00.0000   # your longitude
+# ~/.config/hypr/UserScripts/Weather.py
+MANUAL_PLACE: Optional[str] = "Sua Cidade, Seu Estado"
+MANUAL_LAT: Optional[float] = -00.0000
+MANUAL_LON: Optional[float] = -00.0000
 ```
 
-Find your coordinates at [latlong.net](https://www.latlong.net/) or via `curl ipinfo.io`.
+Coordenadas: `curl ipinfo.io` ou [latlong.net](https://www.latlong.net/).
+
+### Wallpaper padrão
+
+Os wallpapers ficam em `~/Imagens/wallpapers/`. Para mudar o padrão edite `~/.config/hypr/hyprpaper.conf` e `~/.config/hypr/hyprlock.conf` (o caminho do fundo da tela de lock).
+
+Pela Waybar você pode trocar com `SUPER + W` (menu) ou clique direito no botão de wallpaper para um aleatório.
+
+### Módulo apolo
+
+O ícone  na Waybar abre a TUI de revisão de emails do projeto [proton-api](../proton-api). Ele espera que o projeto esteja em `~/proton-api` com um venv em `.venv/`. Se não usar, remova `"custom/apolo"` do arquivo `~/.config/waybar/configs/[TOP] Andre Liquid Glass`.
+
+### ProtonVPN
+
+O widget detecta o estado da VPN via `protonvpn status`. Requer o [ProtonVPN CLI](https://protonvpn.com/support/linux-vpn-tool/) instalado e autenticado (`protonvpn signin`).
 
 ---
 
-## Keybinds
+## Atalhos principais
 
-Press `SUPER + H` or click the `󰌌` button on Waybar to open the full interactive cheatsheet.
-
-**Most important shortcuts:**
-
-| Key | Action |
-|-----|--------|
+| Tecla | Ação |
+|-------|------|
 | `SUPER + Enter` | Terminal (Kitty) |
-| `SUPER + D` | App launcher (Rofi) |
-| `SUPER + Q` | Close window |
-| `SUPER + W` | Wallpaper menu |
-| `SUPER + T` | Change theme (wallust) |
-| `SUPER + H` | Keybind cheatsheet |
-| `SUPER + SHIFT + K` | Search all keybinds |
-| `CTRL + ALT + L` | Lock screen |
-| `CTRL + ALT + P` | Power menu |
-| `SUPER + 1–0` | Switch workspace |
+| `SUPER + D` | Launcher (Rofi) |
+| `SUPER + Q` | Fechar janela |
+| `SUPER + W` | Menu de wallpaper |
+| `SUPER + C` | VS Code |
+| `SUPER + H` | Dicas rápidas |
+| `SUPER + SHIFT + K` | Buscar todos os atalhos |
+| `SUPER + CTRL + B` | Mudar estilo da Waybar |
+| `SUPER + ALT + B` | Mudar layout da Waybar |
+| `CTRL + ALT + L` | Bloquear tela |
+| `CTRL + ALT + P` | Menu de energia |
+| `SUPER + 1–0` | Mudar workspace |
 
 ---
 
-## Customization
+## O que é customizado aqui vs JaKooLit original
 
-| File | What it controls |
-|------|-----------------|
-| `~/.config/hypr/UserConfigs/01-UserDefaults.conf` | Default terminal, file manager, editor |
-| `~/.config/hypr/UserConfigs/UserKeybinds.conf` | Your personal keybindings |
-| `~/.config/hypr/UserConfigs/UserSettings.conf` | Gaps, borders, animations toggle |
-| `~/.config/hypr/UserConfigs/UserDecorations.conf` | Window rounding, shadows, blur |
-| `~/.config/hypr/UserScripts/Weather.py` | Weather location |
-| `~/.config/kitty/kitty.conf` | Terminal colors and font |
-| `~/.config/waybar/UserModules` | Add your own Waybar modules |
-| `~/.config/waybar/style/[Extra] Liquid Glass.css` | Waybar visual style |
-
-### Changing the Waybar layout
-
-Press `SUPER + CTRL + B` to pick a Waybar style from a menu, or `SUPER + ALT + B` to switch the module layout.
-
-### Adjusting terminal colors
-
-The color scheme is generated from your wallpaper by **wallust** (stored in `~/.config/kitty/kitty-themes/01-Wallust.conf`). You can override any color in `~/.config/kitty/kitty.conf` — see the comments there for which ANSI slot maps to which prompt segment.
+| Arquivo | O que foi alterado |
+|---------|-------------------|
+| `waybar/configs/[TOP] Andre Liquid Glass` | Layout próprio com módulos apolo, ProtonVPN, connection quality |
+| `waybar/style/[Extra] Liquid Glass.css` | Estilo Liquid Glass (inspirado no iOS 26 / macOS Tahoe) |
+| `waybar/UserModules` | Módulos apolo, protonvpn, connection_quality, keybinds |
+| `waybar/*.sh` | Scripts próprios para ProtonVPN, bluetooth, qualidade de conexão |
+| `hypr/UserConfigs/UserDecorations.conf` | Blur, sombras, bordas com cores do wallust |
+| `hypr/UserConfigs/UserAnimations.conf` | Animações de janela e workspace |
+| `hypr/UserConfigs/UserKeybinds.conf` | Atalho SUPER+C para VS Code |
+| `hypr/UserScripts/Weather.py` | Widget de clima via Open-Meteo (sem API key) |
+| `hypr/UserScripts/CheckUpdates.sh` | Conta updates do pacman + AUR |
+| `hypr/hyprlock.conf` | Tela de lock com hora grande, clima e bateria |
+| `kitty/kitty.conf` | Cores mapeadas para o tema agnosterzak |
+| `ghostty/config` | Terminal alternativo com blur e FantasqueSansM |
 
 ---
 
-## Structure
+## Estrutura
 
 ```
-.config/
-├── hypr/
-│   ├── hyprland.conf          # Main Hyprland config
-│   ├── hyprlock.conf          # Lock screen
-│   ├── hypridle.conf          # Idle/sleep behavior
-│   ├── configs/               # Keybinds, window rules, startup apps
-│   ├── UserConfigs/           # ← Edit these to personalize
-│   ├── UserScripts/           # Custom scripts (weather, wallpaper, etc.)
-│   └── scripts/               # Core scripts (do not edit)
-├── waybar/
-│   ├── configs/               # Bar layouts
-│   ├── style/                 # CSS themes
-│   └── UserModules            # ← Add your own modules here
-├── kitty/                     # Terminal config
-├── rofi/                      # Launcher themes
-├── swaync/                    # Notification center
-└── wallust/                   # Color scheme templates
+dotfiles/
+├── install.sh                  ← instalador principal
+├── wallpapers/                 ← fundos de tela
+├── .zshrc                      ← config do zsh
+└── .config/
+    ├── hypr/
+    │   ├── hyprland.conf
+    │   ├── hyprlock.conf
+    │   ├── hypridle.conf
+    │   ├── hyprpaper.conf
+    │   ├── UserConfigs/        ← edite aqui para personalizar
+    │   └── UserScripts/        ← scripts customizados
+    ├── waybar/
+    │   ├── configs/            ← layouts disponíveis
+    │   ├── style/              ← temas CSS
+    │   ├── UserModules         ← módulos próprios
+    │   └── *.sh                ← scripts dos módulos
+    ├── kitty/
+    ├── ghostty/
+    ├── rofi/
+    ├── swaync/
+    ├── wlogout/
+    ├── nwg-bar/
+    ├── btop/
+    ├── fastfetch/
+    └── wallust/
 ```
 
 ---
 
-## Credits
+## Créditos
 
-- [JaKooLit](https://github.com/JaKooLit) — base Hyprland-Dots config
-- [Hyprland](https://hyprland.org/) — the compositor
-- [wallust](https://codeberg.org/explosion-mental/wallust) — automatic color theming
+- [JaKooLit](https://github.com/JaKooLit) — base dos dotfiles Hyprland
+- [Hyprland](https://hyprland.org/) — compositor Wayland
+- [wallust](https://codeberg.org/explosion-mental/wallust) — geração automática de cores a partir do wallpaper
