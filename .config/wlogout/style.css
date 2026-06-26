@@ -1,0 +1,65 @@
+/* ================================================
+   wlogout — Liquid Glass
+   ================================================ */
+
+* {
+    font-family: Cantarell;
+    font-size: 14pt;
+    border: none;
+    outline: none;
+}
+
+window {
+    background-color: rgba(0, 0, 0, 0.50);
+    color: rgba(255, 255, 255, 0.90);
+}
+
+/* ---- BOTÕES ---- */
+
+button {
+    background-repeat: no-repeat;
+    background-position: center 65%;
+    background-size: 28%;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 20px;
+    box-shadow: none;
+    transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+button:hover {
+    background-color: transparent;
+    border: none;
+    background-position: center 65%;
+    background-size: 34%;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 20px;
+    box-shadow: none;
+}
+
+button:focus {
+    background-color: transparent;
+    background-size: 32%;
+}
+
+/* ---- ÍCONES ---- */
+
+#lock       { background-image: image(url("./icons/lock.png")); }
+#lock:hover { background-image: image(url("./icons/lock-hover.png")); }
+
+#logout       { background-image: image(url("./icons/logout.png")); }
+#logout:hover { background-image: image(url("./icons/logout-hover.png")); }
+
+#suspend       { background-image: image(url("./icons/sleep.png")); }
+#suspend:hover { background-image: image(url("./icons/sleep-hover.png")); }
+
+#shutdown       { background-image: image(url("./icons/power.png")); }
+#shutdown:hover { background-image: image(url("./icons/power-hover.png")); }
+
+#reboot       { background-image: image(url("./icons/restart.png")); }
+#reboot:hover { background-image: image(url("./icons/restart-hover.png")); }
+
+#hibernate       { background-image: image(url("./icons/hibernate.png")); }
+#hibernate:hover { background-image: image(url("./icons/hibernate-hover.png")); }

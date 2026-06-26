@@ -26,6 +26,9 @@
 
 "modules-center": [
     "custom/weather",
+    "custom/apolo",
+    "custom/protonvpn",
+    "custom/connection_quality",
     "clock",
     ],
 
@@ -40,6 +43,7 @@
     "custom/swaync",
     "tray",
     "custom/cycle_wall",
+    "custom/keybinds",
     "custom/power",
     ],
 }

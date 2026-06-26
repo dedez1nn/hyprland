@@ -7,6 +7,13 @@
 
 {
 
+"custom/apolo": {
+    "format": " ",
+    "tooltip": true,
+    "tooltip-format": "apolo · triagem de emails (clique pra abrir)",
+    "on-click": "kitty --title 'apolo · review' --class apolo-review -e $HOME/.config/waybar/apolo-review.sh"
+},
+
 "custom/updates": {
     "exec": "$HOME/.config/hypr/UserScripts/CheckUpdates.sh",
     "return-type": "json",
@@ -15,6 +22,33 @@
     "tooltip": true,
     "on-click": "kitty --title 'System Update' yay -Syu",
     "on-click-right": "$HOME/.config/hypr/UserScripts/CheckUpdates.sh"
+},
+
+"custom/protonvpn": {
+    "exec": "$HOME/.config/waybar/protonvpn-status.sh",
+    "return-type": "json",
+    "interval": 15,
+    "signal": 8,
+    "exec-on-event": true,
+    "tooltip": true,
+    "on-click": "$HOME/.config/waybar/protonvpn-toggle.sh toggle",
+    "on-click-right": "$HOME/.config/waybar/protonvpn-toggle.sh connect",
+    "on-click-middle": "$HOME/.config/waybar/protonvpn-toggle.sh disconnect"
+},
+
+"custom/connection_quality": {
+    "exec": "$HOME/.config/waybar/connection-quality.sh",
+    "return-type": "json",
+    "interval": 20,
+    "tooltip": true,
+    "on-click-right": "$HOME/.config/hypr/scripts/WaybarScripts.sh --nmtui"
+},
+
+"custom/keybinds": {
+    "format": "󰌌",
+    "on-click": "$HOME/.config/hypr/UserScripts/KeybindSheet.sh",
+    "tooltip": true,
+    "tooltip-format": "Atalhos do teclado"
 }
 
 }

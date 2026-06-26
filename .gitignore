@@ -20,3 +20,17 @@ __pycache__/
 
 # Quickshell state
 .config/quickshell/GlobalStates.qml
+
+# Waybar symlinks gerenciados pelo install.sh
+.config/waybar/config
+.config/waybar/style.css
+
+# Bluetooth cache (MACs dos dispositivos do usuário)
+.config/waybar/bluetooth-preferred-devices
+
+# Fish: variáveis de ambiente geradas
+.config/fish/fish_variables
+
+# Ghostty tema gerado por wallust
+.config/ghostty/wallust.conf
+.config/ghostty/theme.conf

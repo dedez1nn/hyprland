@@ -117,6 +117,23 @@ window#waybar.empty #window {
     padding: 0 8px;
 }
 
+/* ---- APOLO (botão de triagem) ---- */
+
+#custom-apolo {
+    background-image: url("HOME_PLACEHOLDER/.config/waybar/apolo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px 20px;
+    min-width: 22px;
+    padding: 0 6px;
+    margin: 0 2px;
+    transition: background-size 0.15s ease;
+}
+
+#custom-apolo:hover {
+    background-size: 24px 24px;
+}
+
 /* ---- BRILHO ---- */
 
 #backlight {
@@ -145,6 +162,53 @@ window#waybar.empty #window {
 
 #network.disconnected {
     color: rgba(255, 100, 100, 0.85);
+}
+
+/* ---- PROTONVPN ---- */
+
+#custom-protonvpn {
+    padding: 0 6px;
+    font-size: 15px;
+    transition: all 0.20s ease;
+}
+
+#custom-protonvpn.connected {
+    color: rgba(120, 255, 180, 0.95);
+}
+
+#custom-protonvpn.disconnected {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+#custom-protonvpn.connecting {
+    color: rgba(150, 210, 255, 0.95);
+}
+
+#custom-protonvpn.warning,
+#custom-protonvpn.error {
+    color: rgba(255, 190, 110, 0.95);
+}
+
+/* ---- CONNECTION QUALITY ---- */
+
+#custom-connection_quality {
+    padding: 0 4px;
+    font-size: 14px;
+}
+
+#custom-connection_quality.good {
+    color: rgba(120, 255, 180, 0.95);
+}
+
+#custom-connection_quality.reasonable,
+#custom-connection_quality.warning {
+    color: rgba(255, 215, 110, 0.95);
+}
+
+#custom-connection_quality.poor,
+#custom-connection_quality.disconnected,
+#custom-connection_quality.error {
+    color: rgba(255, 110, 110, 0.95);
 }
 
 /* ---- BATTERY ---- */
@@ -202,6 +266,19 @@ window#waybar.empty #window {
 
 #custom-cycle_wall:hover {
     color: rgba(255, 255, 255, 0.90);
+}
+
+/* ---- KEYBINDS ---- */
+
+#custom-keybinds {
+    color: rgba(255, 255, 255, 0.55);
+    padding: 0 6px;
+    font-size: 15px;
+    transition: all 0.20s ease;
+}
+
+#custom-keybinds:hover {
+    color: rgba(150, 210, 255, 0.95);
 }
 
 /* ---- POWER ---- */

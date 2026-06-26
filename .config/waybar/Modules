@@ -92,7 +92,8 @@
 	"tooltip-format-connected": "{device_enumerate}",
 	"tooltip-format-enumerate-connected": " {device_alias} 󰂄{device_battery_percentage}%",
 	"tooltip": true,
-	"on-click": "blueman-manager",
+	"on-click": "$HOME/.config/waybar/bluetooth-toggle.sh",
+	"on-click-right": "blueman-manager",
 },
 
 "clock": {
