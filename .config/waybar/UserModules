@@ -40,7 +40,9 @@
     "exec": "$HOME/.config/waybar/connection-quality.sh",
     "return-type": "json",
     "interval": 20,
+    "signal": 9,
     "tooltip": true,
+    "on-click": "pkill -RTMIN+9 waybar",
     "on-click-right": "$HOME/.config/hypr/scripts/WaybarScripts.sh --nmtui"
 },
 

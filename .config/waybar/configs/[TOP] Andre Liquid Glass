@@ -27,6 +27,7 @@
 "modules-center": [
     "custom/weather",
     "custom/apolo",
+    "network#speed",
     "custom/protonvpn",
     "custom/connection_quality",
     "clock",
