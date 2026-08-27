@@ -1,0 +1,90 @@
+# Backlog
+
+Lista viva de tudo que foi pedido pro Quickshell Dashboard, widget por
+widget. `[x]` é o que já está implementado (ver detalhes técnicos no
+`README.md`); `[ ]` é o que falta ou foi pedido depois e ainda não entrou.
+Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
+
+## Card de boas-vindas
+
+- [x] Avatar (placeholder por enquanto, sem foto)
+- [x] Saudação por horário (bom dia / boa tarde / boa noite / boa madrugada)
+- [x] Tempo de atividade do sistema (uptime, via `/proc/uptime` —
+      `UptimeService.qml`, não usado mais no card, ver item abaixo)
+- [x] **Streak de commits** — varre `~/repos/*` via `git log --all` (sem
+      filtro de autor), conta dias seguidos com pelo menos 1 commit,
+      considerando "vivo" até virar o dia mesmo sem commit ainda hoje
+      (`CommitStreakService.qml`)
+- [x] **Tempo de atividade na sessão** — substituiu o uptime bruto no
+      card. Detecção de idle via protocolo `ext-idle-notify`
+      (`Quickshell.Wayland.IdleMonitor`, timeout de 120s), acumulando só os
+      segundos ativos (`ActiveTimeService.qml`). Zera quando o Quickshell
+      reinicia (coincide com o login, já que sobe via systemd)
+
+## Relógio + calendário
+
+- [x] Relógio ao vivo (hora + data por extenso em pt_BR)
+- [x] Eventos do Proton Calendar via link `.ics` público (lista simples, até
+      4 próximos eventos)
+- [x] **Tira da semana corrente** — segunda a domingo, dia de hoje
+      destacado, pontinho embaixo do dia que tem evento, mais a mensagem
+      "N eventos essa semana" (`modules/ClockCalendar.qml`)
+- [ ] **Grade de mês navegável** — a tira acima só mostra a semana atual;
+      falta um calendário de verdade com navegação entre meses, se quiser
+      ir além disso
+- [ ] (limitação conhecida, não pedida — documentar) eventos recorrentes
+      (RRULE) ainda não são expandidos, só a primeira ocorrência aparece
+
+## Clima (Open-Meteo)
+
+- [x] Temperatura, ícone, descrição, cidade — geolocalização por IP
+- [x] Bind na interface de rede física pra não pegar a localização do
+      servidor de saída da VPN (usuário usa ProtonVPN)
+- [x] Correção manual de cidade errada (ex: IP geolocalizava "São Sebastião
+      do Paraíso" em vez de "Passos")
+- [ ] **Umidade** — já vem da API (`WeatherService.humidity`), só falta
+      exibir no card
+- [ ] **Vento** — já vem da API (`WeatherService.windSpeed`), só falta
+      exibir no card
+- [ ] **Outras informações** — a definir (sensação térmica? previsão dos
+      próximos dias? nascer/pôr do sol? perguntar antes de implementar)
+
+## Mini player (YouTube Music)
+
+- [x] Detecção via MPRIS/`playerctl`, filtrando só `music.youtube.com`
+- [x] Capa (com fallback), título, artista
+- [x] Controles: anterior, play/pause, próxima
+
+## Notas rápidas (Notion)
+
+- [ ] Não iniciado — planejado pra parte 5: integração real via API do
+      Notion (token + database ID)
+
+## Dock/taskbar preta
+
+- [ ] Não iniciado — planejado pra parte 6: ícones de apps abertos +
+      fixados, clique direito pra fixar/desafixar
+
+## Geral / transversal
+
+- [x] Mostra/esconde sozinho conforme o workspace atual tem ou não janelas
+      (`HyprlandWorkspaceService`)
+- [x] **Identidade visual própria** — "Relevo Suave": fundo translúcido
+      (~72% opacidade) com borda fina cinza-clara, mais sombra dupla
+      (`RectangularShadow` do QtQuick.Effects) simulando o card esculpido
+      do próprio fundo, em vez do retângulo liso e opaco genérico de antes
+      (`common/widgets/Card.qml`). Fonte "Rubik" segue declarada mas não
+      instalada no sistema (cai no fallback Noto Sans) — pendente se
+      quiser resolver.
+- [x] **Layout espalhado pela tela** — boas-vindas no topo central,
+      calendário à esquerda no meio, YouTube Music à direita no meio, clima
+      no canto inferior direito (`modules/DashboardWindow.qml`), em vez de
+      empilhados num canto só.
+- [x] **Autostart via systemd** — `~/.config/systemd/user/quickshell-dashboard.service`,
+      iniciado no login do Hyprland (`configs/Startup_Apps.conf`). Ver
+      seção "Autostart" no `README.md`.
+- [x] **Arrastar os cards** — alça (três ranhuras) no canto superior
+      direito de cada card, cursor muda pra mãozinha ao passar o mouse.
+      Posição salva em `config/positions.json`
+      (`WidgetPositionService.qml`) e restaurada no próximo reload. Ver
+      seção "Arrastar widgets" no `README.md`.

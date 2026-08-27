@@ -1,0 +1,4 @@
+singleton Appearance 1.0 Appearance.qml
+singleton Config 1.0 Config.qml
+StyledText 1.0 widgets/StyledText.qml
+Card 1.0 widgets/Card.qml

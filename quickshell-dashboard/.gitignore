@@ -1,0 +1,5 @@
+# Token do Notion e outros segredos (parte 5) — nunca comitar.
+config/secrets.json
+
+# Posição dos widgets arrastados — específico da tela/resolução atual.
+config/positions.json
