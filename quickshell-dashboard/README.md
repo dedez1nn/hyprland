@@ -5,8 +5,8 @@ padrão do módulo `~/.config/quickshell/overview` já existente neste repo.
 
 **Status:** em desenvolvimento dentro do repo, ainda não simlinkado em
 `~/.config/quickshell/` (roda direto do caminho do repo, ver seção
-"Autostart"). Widgets, identidade visual e autostart já aprovados; parte 5
-(notas) e parte 6 (dock) seguem pendentes.
+"Autostart"). Widgets, identidade visual, autostart e notas do Notion (parte
+5) já aprovados; parte 6 (dock) segue pendente.
 
 **Comportamento de área de trabalho:** o dashboard só fica visível quando o
 workspace focado está sem janelas (`HyprlandWorkspaceService`, via
@@ -50,8 +50,10 @@ simulando o card esculpido do próprio fundo. Cores em
    O Firefox já expõe MPRIS com `xesam:url` da aba tocando; o widget só
    aparece quando a URL ativa é `music.youtube.com` (filtra qualquer outro
    player/aba).
-5. **Notas rápidas com Notion** — integração real via API do Notion (token +
-   database ID, ver `config/secrets.example.json`). Nunca comitar o token.
+5. **Notas rápidas com Notion** — integração real via API do Notion (token,
+   ver `config/secrets.example.json`). Nunca comitar o token. Lista tudo que
+   a integração enxerga (`/v1/search`) e permite abrir e editar os blocos de
+   texto de qualquer página.
 6. **Dock/taskbar preta** — ícones de apps abertos (via `hyprctl clients -j`,
    igual ao `HyprlandData.qml` do módulo overview) + apps fixados. Clique
    direito num ícone abre menu pra fixar/desafixar, como uma taskbar de
@@ -85,8 +87,12 @@ simulando o card esculpido do próprio fundo. Cores em
 - Mostra capa (com fallback 🎵 se não tiver `artUrl`), título, artista, e controles clicáveis (⏮ ⏸/▶ ⏭ via `playerctl -p <player> <ação>`).
 - Card só aparece quando `MediaService.active` é verdadeiro (algo tocando em `music.youtube.com`); caso contrário fica completamente escondido.
 
-### Notas rápidas com Notion — não iniciado
-Planejado (parte 5): integração real via API do Notion. `SecretsService.qml` já lê `notion.token`/`notion.databaseId` de `config/secrets.json`, mas nada ainda usa esses valores.
+### Notas rápidas com Notion (`modules/QuickNotes.qml` + `services/NotionService.qml`)
+- Lista tudo que a integração enxerga via `POST /v1/search` (páginas e databases compartilhadas com ela no Notion — menu "..." → Connections de cada página; compartilhar uma página raiz propaga pras subpáginas), em vez de fixar uma database só.
+- Clicar num item busca os blocos de primeiro nível (`GET /v1/blocks/{id}/children`) e mostra cada um numa caixa de texto editável; "Salvar" faz `PATCH /v1/blocks/{id}` de cada bloco alterado, "+ nova nota" acrescenta um parágrafo vazio (`PATCH /v1/blocks/{id}/children`).
+- Todo `curl` vai com os argumentos como lista (`command: [...]`), nunca como string `bash -c` — o texto dos blocos é digitado pelo usuário e vai direto no corpo da requisição, então interpolar numa string de shell arriscaria injeção de comando.
+- Limitações conhecidas: só os tipos paragraph/heading_1-3/bulleted_list_item/numbered_list_item/to_do são lidos e editáveis (outros tipos aparecem como "(bloco não suportado)", somente-leitura); só o primeiro nível de blocos da página (sem expandir blocos filhos aninhados); sem rich text de verdade (só texto plano — negrito/cor/link não sobrevivem a uma edição salva pelo widget).
+- Pra digitar dentro do `TextEdit` de um bloco funcionar, `modules/DashboardWindow.qml` precisou trocar `WlrLayershell.keyboardFocus` de `None` pra `OnDemand` — com `None` a janela nunca recebe teclado de verdade no protocolo Wayland, mesmo com o QML achando que o campo tem foco. `OnDemand` só cede foco de teclado quando algo dentro da janela pede (ex: clicar numa nota), sem afetar os outros widgets (nenhum é campo de texto).
 
 ### Dock/taskbar preta — não iniciado
 Planejado (parte 6): ícones de apps abertos + fixados, clique direito pra fixar/desafixar.
@@ -169,7 +175,7 @@ quickshell-dashboard/
 │   ├── MediaService.qml                # playerctl, filtro music.youtube.com
 │   ├── HyprlandWorkspaceService.qml    # mostra/esconde por workspace vazio
 │   ├── WidgetPositionService.qml       # posição dos cards arrastados
-│   ├── NotionService.qml               # (parte 5, ainda não existe)
+│   ├── NotionService.qml               # busca (/v1/search) + blocos de página do Notion
 │   └── HyprlandApps.qml                # (parte 6, ainda não existe)
 ├── modules/
 │   ├── WelcomeCard.qml
@@ -177,7 +183,7 @@ quickshell-dashboard/
 │   ├── Weather.qml
 │   ├── MusicPlayer.qml
 │   ├── DashboardWindow.qml   # janela layer-shell com os widgets espalhados
-│   ├── QuickNotes.qml        # (parte 5, ainda não existe)
+│   ├── QuickNotes.qml        # lista + edição de páginas do Notion
 │   └── Dock.qml              # (parte 6, ainda não existe)
 └── config/
     ├── secrets.example.json  # template (token Notion, link .ics Proton)
@@ -204,7 +210,12 @@ quickshell-dashboard/
 - [x] **Parte 4** — `MediaService` + `MusicPlayer` (MPRIS/`playerctl`,
       filtro `music.youtube.com`). Testado com o próprio Firefox expondo
       MPRIS por aba.
-- [ ] **Parte 5** — `QuickNotes` + `NotionService` (API real).
+- [x] **Parte 5** — `QuickNotes` + `NotionService`: busca tudo que a
+      integração enxerga (`/v1/search`) em vez de database fixa, abre
+      página e edita blocos de texto (`PATCH /v1/blocks/{id}`). Falta
+      você criar a integração e compartilhar as páginas desejadas (ver
+      seção "Segredos" abaixo) — sem isso o card mostra "Notion não
+      configurado".
 - [ ] **Parte 6** — `Dock` (apps abertos + fixados, clique direito pra
       pin/unpin).
 - [x] **Extra (não numerado)** — `HyprlandWorkspaceService`: o dashboard
@@ -226,8 +237,13 @@ Campos:
 - `protonCalendarIcsUrl` — link público do Proton Calendar (Configurações →
   Calendário → Compartilhar → Obter link). Quem tiver esse link lê seu
   calendário, trate como senha.
-- `notion.token` / `notion.databaseId` — usados na parte 5, ainda não
-  implementada.
+- `notion.token` — token da integração do Notion. Criar em
+  [notion.so/my-integrations](https://www.notion.so/my-integrations)
+  ("+ New integration", tipo "Internal"), copiar o "Internal Integration
+  Secret". Depois, em cada página raiz que o widget deve enxergar (compartilhar
+  uma propaga pras subpáginas): menu "..." → "Connections" → adicionar a
+  integração criada. Sem isso, `/v1/search` não retorna nada mesmo com token
+  válido.
 
 ## Testar antes de instalar
 

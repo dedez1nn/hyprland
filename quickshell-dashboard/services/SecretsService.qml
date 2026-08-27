@@ -15,7 +15,6 @@ Singleton {
 
     property string protonCalendarIcsUrl: ""
     property string notionToken: ""
-    property string notionDatabaseId: ""
     property bool loaded: false
 
     FileView {
@@ -27,7 +26,6 @@ Singleton {
                 root.protonCalendarIcsUrl = data.protonCalendarIcsUrl || "";
                 const notion = data.notion || {};
                 root.notionToken = notion.token || "";
-                root.notionDatabaseId = notion.databaseId || "";
             } catch (e) {
                 console.error("[SecretsService] Falha ao ler config/secrets.json:", e);
             }

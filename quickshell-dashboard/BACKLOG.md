@@ -63,8 +63,37 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
 
 ## Notas rápidas (Notion)
 
-- [ ] Não iniciado — planejado pra parte 5: integração real via API do
-      Notion (token + database ID)
+- [x] **Busca tudo que a integração enxerga** — em vez de fixar uma
+      database, usa `POST /v1/search` (sem filtro), que devolve toda
+      página/database compartilhada com a integração no Notion (menu
+      "..." → Connections). Compartilhar uma página raiz propaga pras
+      subpáginas dela — responsabilidade do usuário lá na UI do Notion,
+      não tem como fazer pelo código (`services/NotionService.qml`)
+- [x] **Abrir e editar página** — clicar num item da lista busca os
+      blocos de primeiro nível (`GET /v1/blocks/{id}/children`) e mostra
+      cada um numa caixa de texto editável; "Salvar" faz `PATCH
+      /v1/blocks/{id}` de cada bloco alterado, "+ nova nota" acrescenta
+      um parágrafo vazio (`PATCH /v1/blocks/{id}/children`)
+      (`modules/QuickNotes.qml`)
+- [ ] (limitação conhecida, não pedida — documentar) só os tipos
+      paragraph/heading_1-3/bulleted_list_item/numbered_list_item/to_do
+      são lidos e editáveis; qualquer outro tipo (tabela, imagem, blocos
+      aninhados) aparece como "(bloco não suportado)", somente-leitura
+- [ ] (limitação conhecida) só o primeiro nível de blocos da página —
+      blocos filhos aninhados (toggle, sub-página dentro de um bloco) não
+      são expandidos
+- [ ] (limitação conhecida) sem rich text de verdade — só texto plano;
+      negrito/cor/link do bloco original não sobrevivem a uma edição
+      salva pelo widget
+- [x] **Modo leitura por padrão + botão Editar** — página abre só pra
+      leitura; botão "Editar" (branco, canto superior) libera a edição
+      das caixas de texto; botão "Salvar" (branco, embaixo das notas)
+      grava via API e volta pro modo leitura (`modules/QuickNotes.qml`)
+- [x] **Seletor de tamanho 1×/2×/3×** — canto superior direito do card,
+      multiplica `implicitWidth`/`implicitHeight` do widget inteiro
+      (dobra/triplica). Não é persistido entre reloads (sempre volta pra
+      1× no restart do Quickshell) — se fizer falta, dá pra guardar em
+      `WidgetPositionService`/`config/positions.json` depois
 
 ## Dock/taskbar preta
 

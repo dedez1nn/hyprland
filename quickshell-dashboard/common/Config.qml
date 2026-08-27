@@ -13,7 +13,7 @@ QtObject {
         property bool clock: true
         property bool weather: true
         property bool musicPlayer: true
-        property bool quickNotes: false // parte 5
+        property bool quickNotes: true
         property bool dock: false // parte 6
     }
 

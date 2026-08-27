@@ -7,8 +7,11 @@ import "../services"
 /**
  * Janela em layer-shell cobrindo a tela inteira, com os widgets espalhados
  * (cada um numa posição padrão diferente) em vez de empilhados num canto.
- * Não rouba foco de teclado nem bloqueia cliques fora dos cards (mask =
- * união da área de cada widget individualmente).
+ * Não bloqueia cliques fora dos cards (mask = união da área de cada widget
+ * individualmente). Foco de teclado é `OnDemand` (não `None`): só é cedido
+ * de verdade quando algo dentro da janela pede foco (ex: clicar numa nota
+ * do QuickNotes pra editar) — sem isso nenhum TextEdit do dashboard
+ * recebe tecla nenhuma, mesmo com o QML achando que tem foco.
  *
  * Cada widget usa x/y (não anchors) porque dá pra arrastar pela alça no
  * canto do Card — anchors reescreveriam a posição a cada relayout e
@@ -34,7 +37,7 @@ PanelWindow {
 
     WlrLayershell.namespace: "quickshell:dashboard"
     WlrLayershell.layer: WlrLayer.Bottom
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
     anchors {
         top: true
@@ -49,6 +52,7 @@ PanelWindow {
         Region { item: clockCalendar }
         Region { item: musicPlayer }
         Region { item: weather }
+        Region { item: quickNotes }
     }
 
     mask: WidgetPositionService.dragging ? null : cardsRegion
@@ -78,6 +82,13 @@ PanelWindow {
         id: weather
         visible: Config.widgets.weather
         x: WidgetPositionService.get(positionKey)?.x ?? (root.width - width - Config.position.margin)
+        y: WidgetPositionService.get(positionKey)?.y ?? (root.height - height - Config.position.margin)
+    }
+
+    QuickNotes {
+        id: quickNotes
+        visible: Config.widgets.quickNotes
+        x: WidgetPositionService.get(positionKey)?.x ?? Config.position.margin
         y: WidgetPositionService.get(positionKey)?.y ?? (root.height - height - Config.position.margin)
     }
 }
