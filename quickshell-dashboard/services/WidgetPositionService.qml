@@ -16,6 +16,13 @@ Singleton {
 
     property var positions: ({})
 
+    // true enquanto qualquer card está sendo arrastado. DashboardWindow.qml
+    // usa isso pra tirar a mask (aceitar clique na tela toda) durante o
+    // arraste — a mask normal é só a área de cada card, bem menor que o
+    // gesto de arrastar, e o Hyprland para de mandar eventos de mouse pra
+    // janela assim que o cursor sai dela.
+    property bool dragging: false
+
     function get(name) {
         return root.positions[name] || null;
     }

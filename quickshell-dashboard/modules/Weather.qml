@@ -9,72 +9,77 @@ import "../services"
 Card {
     id: root
     positionKey: "weather"
-    implicitWidth: Config.clock.width
-    implicitHeight: 128
+    implicitWidth: content.implicitWidth + 40
+    implicitHeight: content.implicitHeight + 40
 
-    Row {
-        anchors.fill: parent
-        anchors.margins: 20
-        spacing: 16
+    component Stat: Row {
+        id: stat
+        required property string icon
+        required property string value
+        spacing: 8
 
-        StyledText {
+        Image {
+            source: stat.icon
+            width: 13
+            height: 13
+            smooth: true
             anchors.verticalCenter: parent.verticalCenter
-            text: WeatherService.icon
-            font.pixelSize: Appearance.font.sizeHuge
         }
 
-        Column {
+        StyledText {
+            text: stat.value
+            font.pixelSize: Appearance.font.sizeSmall
+            color: Appearance.colors.textMuted
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 4
+        }
+    }
+
+    Column {
+        id: content
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: 20
+        spacing: 14
+
+        Row {
+            spacing: 16
 
             StyledText {
-                text: WeatherService.temperatureText
-                font.pixelSize: Appearance.font.sizeLarge
-                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+                text: WeatherService.icon
+                font.pixelSize: Appearance.font.sizeHuge
             }
 
-            StyledText {
-                text: WeatherService.ready
-                    ? `${WeatherService.description} · ${WeatherService.cityName}`
-                    : (WeatherService.error ? "Clima indisponível" : "Carregando clima...")
-                font.pixelSize: Appearance.font.sizeSmall
-                color: Appearance.colors.textMuted
-            }
+            Column {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
 
-            Row {
-                visible: WeatherService.ready
-                spacing: 10
-
-                Image {
-                    source: "../common/assets/humidity.svg"
-                    width: 12
-                    height: 12
-                    smooth: true
-                    anchors.verticalCenter: parent.verticalCenter
+                StyledText {
+                    text: WeatherService.temperatureText
+                    font.pixelSize: Appearance.font.sizeLarge
+                    font.bold: true
                 }
 
                 StyledText {
-                    text: WeatherService.humidity + "%"
+                    text: WeatherService.ready
+                        ? `${WeatherService.description} · ${WeatherService.cityName}`
+                        : (WeatherService.error ? "Clima indisponível" : "Carregando clima...")
                     font.pixelSize: Appearance.font.sizeSmall
                     color: Appearance.colors.textMuted
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Image {
-                    source: "../common/assets/wind.svg"
-                    width: 12
-                    height: 12
-                    smooth: true
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                StyledText {
-                    text: Math.round(WeatherService.windSpeed) + " km/h"
-                    font.pixelSize: Appearance.font.sizeSmall
-                    color: Appearance.colors.textMuted
-                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
+        }
+
+        Row {
+            visible: WeatherService.ready
+            spacing: 20
+
+            Stat { icon: "../common/assets/humidity.svg"; value: WeatherService.humidity + "% umidade" }
+            Stat { icon: "../common/assets/wind.svg"; value: Math.round(WeatherService.windSpeed) + " km/h" }
+            Stat { icon: "../common/assets/rain-chance.svg"; value: WeatherService.rainChance + "% de chuva" }
+            Stat { icon: "../common/assets/visibility.svg"; value: WeatherService.visibilityKm + " km vis." }
+            Stat { icon: "../common/assets/sunrise.svg"; value: WeatherService.sunrise }
+            Stat { icon: "../common/assets/sunset.svg"; value: WeatherService.sunset }
         }
     }
 }

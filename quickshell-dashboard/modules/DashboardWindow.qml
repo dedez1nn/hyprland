@@ -21,6 +21,10 @@ import "../services"
  * sobreposição por cima do que você está usando. A camada Bottom é mantida
  * como reforço, pra não flashar por cima de uma janela nova entre o evento
  * do Hyprland e a atualização do estado.
+ *
+ * Enquanto WidgetPositionService.dragging é true, a mask vira a tela
+ * inteira (sem isso, o Hyprland para de mandar eventos de mouse assim que
+ * o cursor sai da área minúscula de um card durante o arraste).
  */
 PanelWindow {
     id: root
@@ -39,12 +43,15 @@ PanelWindow {
         bottom: true
     }
 
-    mask: Region {
+    Region {
+        id: cardsRegion
         Region { item: welcomeCard }
         Region { item: clockCalendar }
         Region { item: musicPlayer }
         Region { item: weather }
     }
+
+    mask: WidgetPositionService.dragging ? null : cardsRegion
 
     WelcomeCard {
         id: welcomeCard

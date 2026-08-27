@@ -42,12 +42,18 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
       servidor de saída da VPN (usuário usa ProtonVPN)
 - [x] Correção manual de cidade errada (ex: IP geolocalizava "São Sebastião
       do Paraíso" em vez de "Passos")
-- [ ] **Umidade** — já vem da API (`WeatherService.humidity`), só falta
-      exibir no card
-- [ ] **Vento** — já vem da API (`WeatherService.windSpeed`), só falta
-      exibir no card
+- [x] Umidade e vento exibidos no card (`WeatherService.humidity`/`windSpeed`)
+- [x] **Mais dados no card** — probabilidade de chuva
+      (`precipitation_probability_max` do `daily`), visibilidade
+      (`hourly.visibility`, hora atual), nascer e pôr do sol
+      (`daily.sunrise`/`sunset`). Card virou `Row` (ícone + temp/descrição,
+      centralizada) + `Row` única com os 6 stats (umidade, vento, chuva,
+      visibilidade, nascer, pôr do sol) lado a lado — card cresce
+      lateralmente pra caber tudo numa linha só, em vez de espremer numa
+      largura fixa
+      (`modules/Weather.qml`).
 - [ ] **Outras informações** — a definir (sensação térmica? previsão dos
-      próximos dias? nascer/pôr do sol? perguntar antes de implementar)
+      próximos dias?)
 
 ## Mini player (YouTube Music)
 
@@ -83,8 +89,14 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
 - [x] **Autostart via systemd** — `~/.config/systemd/user/quickshell-dashboard.service`,
       iniciado no login do Hyprland (`configs/Startup_Apps.conf`). Ver
       seção "Autostart" no `README.md`.
-- [x] **Arrastar os cards** — alça (três ranhuras) no canto superior
-      direito de cada card, cursor muda pra mãozinha ao passar o mouse.
-      Posição salva em `config/positions.json`
+- [x] **Arrastar os cards** — card inteiro é arrastável (sem alça
+      dedicada; botões próprios, como os do MusicPlayer, continuam
+      clicáveis por ficarem por cima na ordem de pintura), cursor muda pra
+      mãozinha ao passar o mouse. Posição salva em `config/positions.json`
       (`WidgetPositionService.qml`) e restaurada no próximo reload. Ver
       seção "Arrastar widgets" no `README.md`.
+      - Correção: a mask da janela (que limita onde ela aceita clique)
+        cobria só a área de cada card — o Hyprland parava de mandar
+        eventos de mouse assim que o cursor saía dali durante o arraste,
+        "soltando" o card sozinho. Agora, enquanto `WidgetPositionService.dragging`
+        é true, a mask vira a tela inteira; volta ao normal ao soltar.

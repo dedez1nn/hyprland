@@ -19,8 +19,9 @@ canto — boas-vindas no topo central, calendário à esquerda no meio, YouTube
 Music à direita no meio, clima no canto inferior direito
 (`modules/DashboardWindow.qml`, `Config.position.margin` controla a
 distância padrão de cada um até a borda). Todo card pode ser arrastado
-pela alça no canto superior direito (as "três ranhuras") — a posição fica
-salva em `config/positions.json` e volta no próximo reload, sobrescrevendo
+segurando em qualquer área vazia dele (botões próprios, como os do
+MusicPlayer, continuam clicáveis) — a posição fica salva em
+`config/positions.json` e volta no próximo reload, sobrescrevendo
 a posição padrão. Ver `WidgetPositionService.qml` e a seção "Arrastar
 widgets" abaixo.
 
@@ -75,7 +76,8 @@ simulando o card esculpido do próprio fundo. Cores em
 - Geolocalização por IP (`ip-api.com`) + Open-Meteo (sem precisar de API key).
 - Cuidado com ProtonVPN: a consulta de IP é bindada na interface de rede física (`wlan`/`eth`/`en`, detectada automaticamente), nunca a interface da VPN — testado e confirmado com a VPN conectada de verdade. Sem isso, a geolocalização apontaria pro servidor de saída da VPN.
 - Correção manual de cidade: quando o IP geolocaliza errado (aconteceu com "São Sebastião do Paraíso" em vez de "Passos"), um mapa `cityOverrides` corrige lat/lon/nome automaticamente.
-- O serviço já busca `humidity` (`relative_humidity_2m`) e `windSpeed` (`wind_speed_10m`) da API, mas o card ainda não exibe esses dois campos — só temperatura, ícone, descrição e cidade. Ver `BACKLOG.md`.
+- Card em duas partes empilhadas: `Row` com ícone + temperatura/descrição/cidade (centralizada), e embaixo uma `Row` única com os 6 indicadores lado a lado — umidade, vento, probabilidade de chuva, visibilidade, nascer e pôr do sol. Cada um com um ícone próprio em `common/assets/` (`humidity.svg`, `wind.svg`, `rain-chance.svg`, `visibility.svg`, `sunrise.svg`, `sunset.svg`). O card cresce lateralmente pra caber tudo numa linha só (`implicitWidth: content.implicitWidth + 40`, não usa mais o `Config.clock.width` padrão dos outros cards).
+- Probabilidade de chuva vem de `daily.precipitation_probability_max` (máxima do dia); visibilidade vem de `hourly.visibility` pegando o índice da hora atual (`hourly.time` do Open-Meteo é indexado por hora do dia, 0–23, com `forecast_days=1`); nascer/pôr do sol vêm de `daily.sunrise`/`sunset` (Open-Meteo já devolve em horário local com `timezone=auto`, só corta a parte da data).
 
 ### Mini player (`modules/MusicPlayer.qml` + `services/MediaService.qml`)
 - Poll no `playerctl` a cada 2s, juntando metadados de todos os players MPRIS ativos (`-a`) e filtrando só o que tem `music.youtube.com` na URL (`xesam:url`) — YouTube normal, Spotify etc. ficam ignorados.
@@ -115,12 +117,20 @@ Precisa de `HYPRLAND_INSTANCE_SIGNATURE` importada pro ambiente do systemd
 de dentro do serviço.
 
 ### Arrastar widgets (`common/widgets/Card.qml` + `services/WidgetPositionService.qml`)
-Todo card tem uma alça no canto superior direito (três ranhuras, estilo
-"grip" que alguns sites usam) — passar o mouse por cima muda o cursor pra
-mãozinha aberta, e arrastando ela move o card inteiro (fica com z-index
-mais alto durante o arraste, pra não ficar atrás de outro card). Só a
-alça é arrastável, não o card inteiro, pra não brigar com os cliques dos
-controles do mini player.
+Todo card inteiro é arrastável — passar o mouse por cima muda o cursor pra
+mãozinha aberta, e segurando em qualquer ponto move o card (fica com
+z-index mais alto durante o arraste, pra não ficar atrás de outro). A
+`MouseArea` de arrastar cobre o card todo mas é declarada antes do
+conteúdo de cada widget dentro do `Card`, então qualquer botão próprio
+(ex: os controles do MusicPlayer) fica por cima na ordem de pintura e
+continua clicável normalmente — só onde não tem nada por cima é que o
+clique vira arrasto.
+
+Enquanto o arraste está ativo (`WidgetPositionService.dragging`), a mask
+da janela (`DashboardWindow.qml`) vira a tela inteira em vez de só a área
+dos cards — sem isso, o Hyprland para de mandar eventos de mouse pra
+janela assim que o cursor sai da área (minúscula) do card, e o arraste se
+desfaz sozinho no meio do caminho.
 
 Ao soltar, a posição (`x`, `y`) é salva em `config/positions.json` via
 `WidgetPositionService.set()` (usa `FileView.setText()` do próprio
@@ -143,7 +153,8 @@ quickshell-dashboard/
 │   ├── Config.qml            # tamanhos, posições, toggles de cada widget
 │   ├── Appearance.qml        # paleta de cores, fontes, raio de borda
 │   ├── assets/
-│   │   └── git.png           # ícone do streak de commits (64×64)
+│   │   ├── git.png            # ícone do streak de commits (64×64)
+│   │   └── *.svg               # ícones do card de clima (humidity, wind, rain-chance, visibility, sunrise, sunset)
 │   └── widgets/
 │       ├── Card.qml          # fundo relevo suave + alça de arrastar
 │       └── StyledText.qml

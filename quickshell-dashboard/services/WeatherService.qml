@@ -33,6 +33,10 @@ Singleton {
     property bool isDay: true
     property int humidity: 0
     property real windSpeed: 0
+    property int rainChance: 0
+    property real visibilityKm: 0
+    property string sunrise: ""
+    property string sunset: ""
     property bool ready: false
     property bool error: false
 
@@ -148,7 +152,7 @@ Singleton {
     Process {
         id: weatherProc
         command: ["bash", "-c",
-            `curl -s --max-time 5 "https://api.open-meteo.com/v1/forecast?latitude=${root.latitude}&longitude=${root.longitude}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,is_day&timezone=auto"`
+            `curl -s --max-time 5 "https://api.open-meteo.com/v1/forecast?latitude=${root.latitude}&longitude=${root.longitude}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,is_day&hourly=visibility&daily=sunrise,sunset,precipitation_probability_max&forecast_days=1&timezone=auto"`
         ]
         stdout: StdioCollector {
             id: weatherCollector
@@ -161,6 +165,15 @@ Singleton {
                     root.humidity = c.relative_humidity_2m;
                     root.windSpeed = c.wind_speed_10m;
                     root.isDay = c.is_day === 1;
+
+                    const currentHour = new Date().getHours();
+                    const visibilityM = data.hourly?.visibility?.[currentHour] ?? 0;
+                    root.visibilityKm = Math.round(visibilityM / 1000);
+
+                    root.rainChance = data.daily?.precipitation_probability_max?.[0] ?? 0;
+                    root.sunrise = root.formatDailyTime(data.daily?.sunrise?.[0]);
+                    root.sunset = root.formatDailyTime(data.daily?.sunset?.[0]);
+
                     root.ready = true;
                     root.error = false;
                 } catch (e) {
@@ -169,5 +182,12 @@ Singleton {
                 }
             }
         }
+    }
+
+    // Open-Meteo devolve "2026-08-27T06:12" (já em horário local, timezone=auto).
+    function formatDailyTime(isoValue) {
+        if (!isoValue) return "--:--";
+        const parts = isoValue.split("T");
+        return parts.length === 2 ? parts[1] : "--:--";
     }
 }

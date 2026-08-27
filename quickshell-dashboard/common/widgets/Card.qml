@@ -12,9 +12,13 @@ import "../../services"
  * fundo, cada uma como um shader dedicado do QtQuick.Effects — bem mais
  * barato que um blur genérico atrás do card inteiro.
  *
- * Também dá pra arrastar pela alça (as "três ranhuras") no canto superior
- * direito — a posição final é salva em WidgetPositionService e volta no
- * próximo reload. Widgets que não definem positionKey não salvam posição.
+ * Também dá pra arrastar segurando em qualquer área vazia do card — a
+ * MouseArea de arrastar cobre o card inteiro, mas fica declarada antes do
+ * conteúdo de cada widget, então qualquer botão/MouseArea próprio (ex: os
+ * controles do MusicPlayer) fica por cima na ordem de pintura e continua
+ * clicável normalmente; só onde não tem nada por cima é que o clique vira
+ * arrasto. Posição final salva em WidgetPositionService, volta no próximo
+ * reload. Widgets que não definem positionKey não salvam posição.
  */
 Item {
     id: root
@@ -54,43 +58,21 @@ Item {
         border.color: Appearance.colors.cardBorder
     }
 
-    // Alça de arrastar: três ranhuras no canto superior direito.
-    Item {
-        id: dragHandle
-        width: 28
-        height: 20
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.margins: 4
+    // Arrastar o card: cobre a área inteira, mas fica embaixo do conteúdo
+    // de cada widget na ordem de pintura (ver comentário acima).
+    MouseArea {
+        id: dragArea
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+        drag.target: root
 
-        Column {
-            anchors.centerIn: parent
-            spacing: 3
+        onPressed: WidgetPositionService.dragging = true
 
-            Repeater {
-                model: 3
-
-                Rectangle {
-                    width: 14
-                    height: 2
-                    radius: 1
-                    color: Appearance.colors.textMuted
-                    opacity: dragArea.containsMouse || dragArea.drag.active ? 0.9 : 0.5
-                }
-            }
-        }
-
-        MouseArea {
-            id: dragArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-            drag.target: root
-
-            onReleased: {
-                if (root.positionKey.length > 0) {
-                    WidgetPositionService.set(root.positionKey, root.x, root.y);
-                }
+        onReleased: {
+            WidgetPositionService.dragging = false;
+            if (root.positionKey.length > 0) {
+                WidgetPositionService.set(root.positionKey, root.x, root.y);
             }
         }
     }
