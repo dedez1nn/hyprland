@@ -13,6 +13,29 @@ Card {
     implicitWidth: Config.clock.width
     implicitHeight: content.implicitHeight + 40
 
+    // Badge no canto superior direito com o total de eventos da semana.
+    Rectangle {
+        visible: root.weekEventCount > 0
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 10
+        z: 10
+        width: Math.max(20, badgeText.implicitWidth + 8)
+        height: 20
+        color: "transparent"
+        border.width: 1
+        border.color: Appearance.colors.accentAlt
+
+        StyledText {
+            id: badgeText
+            anchors.centerIn: parent
+            text: root.weekEventCount
+            font.family: Appearance.font.familyMono
+            font.pixelSize: Appearance.font.sizeSmall
+            color: Appearance.colors.accent
+        }
+    }
+
     function eventTimeLabel(event) {
         if (event.allDay) return "Dia todo";
         return event.start.toLocaleTimeString(ClockService.locale, "HH:mm");
@@ -74,14 +97,15 @@ Card {
         StyledText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: ClockService.timeText
+            font.family: Appearance.font.familyMono
             font.pixelSize: Appearance.font.sizeHuge
-            font.bold: true
         }
 
         StyledText {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: ClockService.dateText
+            text: ClockService.dateText.toUpperCase()
             font.pixelSize: Appearance.font.sizeSmall
+            font.letterSpacing: 1
             color: Appearance.colors.textMuted
         }
 
@@ -107,31 +131,32 @@ Card {
                     StyledText {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: root.weekDayLabels[index]
-                        font.pixelSize: Appearance.font.sizeSmall
-                        color: Appearance.colors.textMuted
+                        font.pixelSize: Appearance.font.sizeSmall - 2
+                        color: Appearance.colors.textFaint
                     }
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: 22
                         height: 22
-                        radius: 11
+                        radius: Appearance.radiusSmall
                         color: isToday ? Appearance.colors.accent : "transparent"
+                        border.width: isToday ? 0 : 1
+                        border.color: Appearance.colors.cardBorder
 
                         StyledText {
                             anchors.centerIn: parent
                             text: day.getDate()
+                            font.family: Appearance.font.familyMono
                             font.pixelSize: Appearance.font.sizeSmall
-                            font.bold: isToday
                             color: isToday ? Appearance.colors.background : Appearance.colors.text
                         }
                     }
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: 4
-                        height: 4
-                        radius: 2
+                        width: 3
+                        height: 3
                         color: eventCount > 0 ? Appearance.colors.accent : "transparent"
                     }
                 }
@@ -191,6 +216,7 @@ Card {
 
                 StyledText {
                     text: root.eventDayLabel(modelData) + " " + root.eventTimeLabel(modelData)
+                    font.family: Appearance.font.familyMono
                     font.pixelSize: Appearance.font.sizeSmall
                     color: Appearance.colors.accent
                     width: 110

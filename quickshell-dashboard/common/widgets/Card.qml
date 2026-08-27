@@ -48,6 +48,14 @@ Item {
         border.color: Appearance.colors.cardBorder
     }
 
+    // Cantos de mira ciano (canto superior-esquerdo + inferior-direito) —
+    // assinatura visual do HUD ctOS/DedSec. Só Rectangles simples, sem
+    // shader extra.
+    Rectangle { x: 0; y: 0; width: 12; height: 2; color: Appearance.colors.accentAlt }
+    Rectangle { x: 0; y: 0; width: 2; height: 12; color: Appearance.colors.accentAlt }
+    Rectangle { anchors.right: parent.right; anchors.bottom: parent.bottom; width: 12; height: 2; color: Appearance.colors.accentAlt }
+    Rectangle { anchors.right: parent.right; anchors.bottom: parent.bottom; width: 2; height: 12; color: Appearance.colors.accentAlt }
+
     // Arrastar o card: cobre a área inteira, mas fica embaixo do conteúdo
     // de cada widget na ordem de pintura (ver comentário acima).
     MouseArea {

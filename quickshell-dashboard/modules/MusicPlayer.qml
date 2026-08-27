@@ -23,6 +23,8 @@ Card {
             height: 56
             radius: Appearance.radiusSmall
             color: Appearance.colors.surface
+            border.width: 1
+            border.color: Appearance.colors.borderBright
             clip: true
             anchors.verticalCenter: parent.verticalCenter
 
@@ -37,7 +39,8 @@ Card {
             StyledText {
                 anchors.centerIn: parent
                 visible: MediaService.artUrl.length === 0
-                text: "🎵"
+                text: "♫"
+                color: Appearance.colors.accent
                 font.pixelSize: 24
             }
         }
@@ -68,35 +71,36 @@ Card {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 6
 
-            StyledText {
-                text: "⏮"
-                font.pixelSize: 18
+            component TransportButton: Rectangle {
+                id: btn
+                required property string glyph
+                signal clicked()
+
+                width: 26
+                height: 26
+                color: btnArea.containsMouse ? Appearance.colors.accentAlt : "transparent"
+                border.width: 1
+                border.color: Appearance.colors.borderBright
+
+                StyledText {
+                    anchors.centerIn: parent
+                    text: btn.glyph
+                    color: Appearance.colors.accent
+                    font.pixelSize: 13
+                }
+
                 MouseArea {
+                    id: btnArea
                     anchors.fill: parent
+                    hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: MediaService.previous()
+                    onClicked: btn.clicked()
                 }
             }
 
-            StyledText {
-                text: MediaService.playing ? "⏸" : "▶"
-                font.pixelSize: 18
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: MediaService.playPause()
-                }
-            }
-
-            StyledText {
-                text: "⏭"
-                font.pixelSize: 18
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: MediaService.next()
-                }
-            }
+            TransportButton { glyph: "⏮"; onClicked: MediaService.previous() }
+            TransportButton { glyph: MediaService.playing ? "⏸" : "▶"; onClicked: MediaService.playPause() }
+            TransportButton { glyph: "⏭"; onClicked: MediaService.next() }
         }
     }
 }

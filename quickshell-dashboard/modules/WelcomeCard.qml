@@ -29,23 +29,51 @@ Card {
         anchors.margins: 20
         spacing: 16
 
-        // Avatar placeholder: círculo com a inicial do nome.
-        // Trocar por Image quando tiver uma foto definida.
-        Rectangle {
+        // Avatar: foto recortada em círculo, com cantos de mira ciano em
+        // volta (reticle do HUD ctOS). Cai pra iniciais se avatar.png não
+        // existir.
+        Item {
             id: avatar
             width: 64
             height: 64
-            radius: width / 2
             anchors.verticalCenter: parent.verticalCenter
-            color: Appearance.colors.accent
 
-            StyledText {
-                anchors.centerIn: parent
-                text: Config.welcomeCard.greetingName.charAt(0).toUpperCase()
-                font.pixelSize: Appearance.font.sizeHuge * 0.6
-                font.bold: true
-                color: Appearance.colors.background
+            Rectangle {
+                id: avatarClip
+                anchors.fill: parent
+                radius: width / 2
+                color: Appearance.colors.surface
+                clip: true
+
+                Image {
+                    id: avatarImage
+                    anchors.fill: parent
+                    source: "../common/assets/avatar.png"
+                    fillMode: Image.PreserveAspectCrop
+                    smooth: true
+                    asynchronous: true
+                    visible: status === Image.Ready
+                }
+
+                StyledText {
+                    anchors.centerIn: parent
+                    visible: avatarImage.status !== Image.Ready
+                    text: Config.welcomeCard.greetingName.charAt(0).toUpperCase()
+                    font.pixelSize: Appearance.font.sizeHuge * 0.6
+                    font.bold: true
+                    color: Appearance.colors.accent
+                }
             }
+
+            // cantos de mira
+            Rectangle { x: -2; y: -2; width: 9; height: 2; color: Appearance.colors.accent }
+            Rectangle { x: -2; y: -2; width: 2; height: 9; color: Appearance.colors.accent }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; y: -2; width: 9; height: 2; color: Appearance.colors.accent }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; y: -2; width: 2; height: 9; color: Appearance.colors.accent }
+            Rectangle { x: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 9; height: 2; color: Appearance.colors.accent }
+            Rectangle { x: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 2; height: 9; color: Appearance.colors.accent }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 9; height: 2; color: Appearance.colors.accent }
+            Rectangle { anchors.right: parent.right; anchors.rightMargin: -2; anchors.bottom: parent.bottom; anchors.bottomMargin: -2; width: 2; height: 9; color: Appearance.colors.accent }
         }
 
         Column {
@@ -60,6 +88,14 @@ Card {
                 font.bold: true
             }
 
+            StyledText {
+                text: "STATUS :: SESSÃO ATIVA"
+                font.family: Appearance.font.familyMono
+                font.pixelSize: Appearance.font.sizeSmall - 2
+                font.letterSpacing: 1
+                color: Appearance.colors.accent
+            }
+
             Row {
                 id: statsRow
                 spacing: 24
@@ -68,15 +104,17 @@ Card {
                     spacing: 4
 
                     StyledText {
-                        text: "Tempo de atividade"
-                        font.pixelSize: Appearance.font.sizeSmall
+                        text: "TEMPO DE ATIVIDADE"
+                        font.pixelSize: Appearance.font.sizeSmall - 2
+                        font.letterSpacing: 1
                         color: Appearance.colors.textMuted
                     }
 
                     StyledText {
                         text: ActiveTimeService.prettyText
-                        font.pixelSize: Appearance.font.sizeSmall
-                        font.bold: true
+                        font.family: Appearance.font.familyMono
+                        font.pixelSize: Appearance.font.sizeSmall + 2
+                        color: Appearance.colors.accent
                     }
                 }
 
@@ -95,8 +133,9 @@ Card {
                         }
 
                         StyledText {
-                            text: "streak:"
-                            font.pixelSize: Appearance.font.sizeSmall
+                            text: "STREAK"
+                            font.pixelSize: Appearance.font.sizeSmall - 2
+                            font.letterSpacing: 1
                             color: Appearance.colors.textMuted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -106,8 +145,9 @@ Card {
                         text: CommitStreakService.ready
                             ? `${CommitStreakService.streak} ${CommitStreakService.streak === 1 ? "dia" : "dias"}`
                             : "checando..."
-                        font.pixelSize: Appearance.font.sizeSmall
-                        font.bold: true
+                        font.family: Appearance.font.familyMono
+                        font.pixelSize: Appearance.font.sizeSmall + 2
+                        color: Appearance.colors.accent
                     }
                 }
             }
