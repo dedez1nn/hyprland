@@ -35,7 +35,7 @@ Singleton {
     Component.onCompleted: refresh()
 
     Timer {
-        interval: 2000
+        interval: 4000
         running: true
         repeat: true
         onTriggered: root.refresh()

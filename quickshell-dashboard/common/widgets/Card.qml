@@ -7,10 +7,11 @@ import "../../services"
  * Fundo padrão usado por todo widget do dashboard (WelcomeCard,
  * ClockCalendar, Weather, etc): relevo suave, fundo semi-transparente
  * (deixa o wallpaper aparecer de leve) com uma borda fina pra marcar o
- * contorno. Duas RectangularShadow (sombra escura embaixo/direita + luz
- * sutil em cima/esquerda) simulam o card sendo esculpido do próprio
- * fundo, cada uma como um shader dedicado do QtQuick.Effects — bem mais
- * barato que um blur genérico atrás do card inteiro.
+ * contorno. Uma RectangularShadow (sombra escura embaixo/direita) sugere
+ * o card esculpido do próprio fundo — shader dedicado do QtQuick.Effects,
+ * bem mais barato que um blur genérico atrás do card inteiro. Antes eram
+ * duas sombras (+ uma clara em cima/esquerda); cortada pra reduzir o
+ * número de shaders ativos (memória) — ver BACKLOG.md.
  *
  * Também dá pra arrastar segurando em qualquer área vazia do card — a
  * MouseArea de arrastar cobre o card inteiro, mas fica declarada antes do
@@ -34,17 +35,6 @@ Item {
         color: Appearance.colors.shadowDark
         offset: Qt.vector2d(7, 7)
         blur: 22
-        spread: 1
-        cached: true
-    }
-
-    RectangularShadow {
-        anchors.fill: surface
-        z: -1
-        radius: surface.radius
-        color: Appearance.colors.shadowLight
-        offset: Qt.vector2d(-5, -5)
-        blur: 18
         spread: 1
         cached: true
     }

@@ -76,9 +76,10 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
 - [x] Mostra/esconde sozinho conforme o workspace atual tem ou não janelas
       (`HyprlandWorkspaceService`)
 - [x] **Identidade visual própria** — "Relevo Suave": fundo translúcido
-      (~72% opacidade) com borda fina cinza-clara, mais sombra dupla
-      (`RectangularShadow` do QtQuick.Effects) simulando o card esculpido
-      do próprio fundo, em vez do retângulo liso e opaco genérico de antes
+      (~72% opacidade) com borda fina cinza-clara, mais uma sombra
+      (`RectangularShadow` do QtQuick.Effects, só a escura desde a
+      otimização de memória abaixo) simulando o card esculpido do próprio
+      fundo, em vez do retângulo liso e opaco genérico de antes
       (`common/widgets/Card.qml`). Fonte "Rubik" segue declarada mas não
       instalada no sistema (cai no fallback Noto Sans) — pendente se
       quiser resolver.
@@ -100,3 +101,9 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
         eventos de mouse assim que o cursor saía dali durante o arraste,
         "soltando" o card sozinho. Agora, enquanto `WidgetPositionService.dragging`
         é true, a mask vira a tela inteira; volta ao normal ao soltar.
+- [x] **Otimização de memória** — cortada a sombra clara de cada card (só
+      sobrou a escura), reduzindo pela metade os shaders `RectangularShadow`
+      ativos (8 → 4 no total). Poll do `MediaService`/`playerctl` foi de 2s
+      pra 4s. O baseline de ~80-100MB é o custo fixo de rodar Quickshell/Qt
+      Quick com efeitos GPU, não dá pra cortar muito mais sem abrir mão de
+      sombra/transparência.

@@ -20,9 +20,8 @@ QtObject {
         readonly property color danger: "#f7768e"
         readonly property color success: "#9ece6a"
 
-        // Par de sombras do relevo suave (ver common/widgets/Card.qml)
+        // Sombra do relevo suave (ver common/widgets/Card.qml)
         readonly property color shadowDark: "#8c000000"
-        readonly property color shadowLight: "#14ffffff"
 
         // Fundo do card: backgroundAlt com ~72% de opacidade, deixando o
         // wallpaper aparecer de leve por trás. borda fina pra marcar o
