@@ -3,3 +3,6 @@ config/secrets.json
 
 # Posição dos widgets arrastados — específico da tela/resolução atual.
 config/positions.json
+
+# Contador de tempo ativo — estado efêmero, atrelado ao boot atual.
+config/active-time.json
