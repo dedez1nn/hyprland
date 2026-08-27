@@ -31,7 +31,10 @@ QtObject {
     }
 
     readonly property QtObject font: QtObject {
-        readonly property string family: "Rubik"
+        // "Open Sans" está instalada de verdade no sistema — trocada de
+        // "Rubik" (nunca esteve instalada, caía num fallback silencioso do
+        // fontconfig, geralmente Noto Sans).
+        readonly property string family: "Open Sans"
         readonly property int sizeSmall: 11
         readonly property int sizeNormal: 13
         readonly property int sizeLarge: 18

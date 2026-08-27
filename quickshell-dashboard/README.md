@@ -91,7 +91,10 @@ simulando o card esculpido do próprio fundo. Cores em
 - Lista tudo que a integração enxerga via `POST /v1/search` (páginas e databases compartilhadas com ela no Notion — menu "..." → Connections de cada página; compartilhar uma página raiz propaga pras subpáginas), em vez de fixar uma database só.
 - Clicar num item busca os blocos de primeiro nível (`GET /v1/blocks/{id}/children`) e mostra cada um numa caixa de texto editável; "Salvar" faz `PATCH /v1/blocks/{id}` de cada bloco alterado, "+ nova nota" acrescenta um parágrafo vazio (`PATCH /v1/blocks/{id}/children`).
 - Todo `curl` vai com os argumentos como lista (`command: [...]`), nunca como string `bash -c` — o texto dos blocos é digitado pelo usuário e vai direto no corpo da requisição, então interpolar numa string de shell arriscaria injeção de comando.
-- Limitações conhecidas: só os tipos paragraph/heading_1-3/bulleted_list_item/numbered_list_item/to_do são lidos e editáveis (outros tipos aparecem como "(bloco não suportado)", somente-leitura); só o primeiro nível de blocos da página (sem expandir blocos filhos aninhados); sem rich text de verdade (só texto plano — negrito/cor/link não sobrevivem a uma edição salva pelo widget).
+- Blocos `to_do` mostram checkbox de verdade (☐/☑, clicável em modo edição) com texto riscado quando marcado, em vez de só o texto puxado.
+- Blocos filhos (ex: checklist indentada sob um parágrafo) são buscados recursivamente — um `GET /children` extra por bloco com `has_children: true`, até 4 níveis de profundidade — e mostrados com indentação visual.
+- Limitações conhecidas: só os tipos paragraph/heading_1-3/bulleted_list_item/numbered_list_item/to_do são lidos e editáveis (outros tipos aparecem como "(bloco não suportado)", somente-leitura); acima de 4 níveis de aninhamento os blocos não são mais expandidos; sem rich text de verdade (só texto plano — negrito/cor/link não sobrevivem a uma edição salva pelo widget).
+- Fonte das notas escala junto com o seletor 1×/2×/3× (`noteFontSize`), em vez de ficar do mesmo tamanho enquanto só o card cresce; texto um pouco mais grosso (`Font.Medium`, headings em `Font.Bold`) e mais branco (`noteTextColor`) que o padrão do dashboard, pra melhorar a leitura de páginas com texto denso.
 - Pra digitar dentro do `TextEdit` de um bloco funcionar, `modules/DashboardWindow.qml` precisou trocar `WlrLayershell.keyboardFocus` de `None` pra `OnDemand` — com `None` a janela nunca recebe teclado de verdade no protocolo Wayland, mesmo com o QML achando que o campo tem foco. `OnDemand` só cede foco de teclado quando algo dentro da janela pede (ex: clicar numa nota), sem afetar os outros widgets (nenhum é campo de texto).
 
 ### Dock/taskbar preta — não iniciado
@@ -99,7 +102,7 @@ Planejado (parte 6): ícones de apps abertos + fixados, clique direito pra fixar
 
 ### Comportamento geral (`services/HyprlandWorkspaceService.qml`)
 - O dashboard inteiro só fica visível quando o workspace focado está sem janelas (`hyprctl activeworkspace -j`, atualizado via eventos do Hyprland) — funciona como uma área de trabalho, não uma sobreposição por cima do que você está usando.
-- Identidade visual: "Relevo Suave" (ver seção acima) — fundo translúcido, borda fina cinza-clara e sombra dupla em vez do retângulo liso e opaco genérico de antes. A fonte declarada é "Rubik", que não está instalada no sistema — cai no fallback padrão (Noto Sans) via fontconfig.
+- Identidade visual: "Relevo Suave" (ver seção acima) — fundo translúcido, borda fina cinza-clara e sombra dupla em vez do retângulo liso e opaco genérico de antes. Fonte "Open Sans" (`Appearance.font.family`), instalada de verdade no sistema — antes era "Rubik", nunca instalada, e caía num fallback silencioso do fontconfig.
 - Layout espalhado pela tela (ver seção "Layout" acima), em vez de empilhado num canto.
 
 ### Autostart (`~/.config/systemd/user/quickshell-dashboard.service`)

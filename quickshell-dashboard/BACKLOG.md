@@ -79,9 +79,25 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
       paragraph/heading_1-3/bulleted_list_item/numbered_list_item/to_do
       são lidos e editáveis; qualquer outro tipo (tabela, imagem, blocos
       aninhados) aparece como "(bloco não suportado)", somente-leitura
-- [ ] (limitação conhecida) só o primeiro nível de blocos da página —
-      blocos filhos aninhados (toggle, sub-página dentro de um bloco) não
-      são expandidos
+- [x] **Checklist indentada sob outro bloco** — blocos filhos (ex: uma
+      lista de `to_do` indentada sob um parágrafo de data, como "24/08:")
+      não apareciam, porque só o primeiro nível de `children` da página
+      era buscado. Agora `NotionService` busca recursivamente (um GET
+      `/children` extra por bloco com `has_children: true`) até 4 níveis
+      de profundidade, com indentação visual proporcional
+      (`modules/QuickNotes.qml`)
+- [x] **Checkbox visível nos blocos `to_do`** — antes só o texto aparecia;
+      agora desenha ☐/☑ (clicável em modo edição) e risca o texto quando
+      marcado
+- [x] **Letra pequena mesmo em 2×/3×** — o seletor de tamanho só crescia
+      o card, não a fonte lá dentro. Agora o texto das notas
+      (`noteFontSize`) cresce junto com `sizeLevel`, além de mais grosso
+      (`Font.Medium`, títulos/headings em `Font.Bold`) e mais branco
+      (`noteTextColor`, "#f5f7ff") que o texto padrão do dashboard
+      (`modules/QuickNotes.qml`). De quebra, a fonte declarada em
+      `Appearance.qml` trocou de "Rubik" (nunca instalada, sempre caiu
+      num fallback silencioso) pra "Open Sans" (instalada de verdade) —
+      efeito em todos os widgets, não só nas notas
 - [ ] (limitação conhecida) sem rich text de verdade — só texto plano;
       negrito/cor/link do bloco original não sobrevivem a uma edição
       salva pelo widget

@@ -21,10 +21,13 @@ import Quickshell.Io
  * Limitações conhecidas (MVP):
  * - Só os tipos de bloco paragraph/heading_1-3/bulleted_list_item/
  *   numbered_list_item/to_do são lidos e editáveis; qualquer outro tipo
- *   (tabela, imagem, blocos aninhados etc.) aparece como linha
- *   somente-leitura "(bloco não suportado)".
- * - Só o primeiro nível de `children` da página aberta — blocos filhos
- *   aninhados (toggle, sub-página) não são expandidos.
+ *   (tabela, imagem, sub-página etc.) aparece como linha somente-leitura
+ *   "(bloco não suportado)".
+ * - Blocos filhos (ex: checklist indentada sob um parágrafo) são buscados
+ *   recursivamente (um GET /children por bloco com has_children=true) até
+ *   maxFetchDepth níveis de profundidade — abaixo disso, netos de netos
+ *   não são expandidos. Isso significa um GET por bloco aninhado; páginas
+ *   muito grandes/profundas demoram mais pra abrir.
  * - Sem rich text de verdade (negrito, cor, link) — só texto plano.
  * - PATCH de um bloco reescreve o objeto do tipo inteiro; formatação/cor
  *   eventual do bloco original não é preservada (exceto `checked` do
@@ -35,6 +38,7 @@ Singleton {
 
     readonly property bool configured: SecretsService.notionToken.length > 0
     readonly property var supportedBlockTypes: ["paragraph", "heading_1", "heading_2", "heading_3", "bulleted_list_item", "numbered_list_item", "to_do"]
+    readonly property int maxFetchDepth: 4
 
     // Navegação: "list" (busca) ou "detail" (blocos de uma página aberta)
     property string view: "list"
@@ -44,6 +48,14 @@ Singleton {
     property var items: []
     property bool listReady: false
     property bool listError: false
+
+    // Busca recursiva de blocos filhos: fetchQueue guarda { id, depth } de
+    // cada bloco (ou a própria página) ainda por buscar; blocksByParent
+    // acumula os resultados brutos parseados por id do pai, remontados em
+    // lista única (flatten) só quando a fila esvazia.
+    property var fetchQueue: []
+    property var currentFetchJob: null
+    property var blocksByParent: ({})
 
     property var blocks: []
     property bool blocksReady: false
@@ -78,13 +90,29 @@ Singleton {
     }
 
     function parseBlock(raw) {
+        const hasChildren = !!raw.has_children;
         if (!root.supportedBlockTypes.includes(raw.type)) {
-            return { id: raw.id, type: raw.type, text: "(bloco não suportado)", supported: false, dirty: false };
+            return { id: raw.id, type: raw.type, text: "(bloco não suportado)", supported: false, dirty: false, hasChildren };
         }
         const typeObj = raw[raw.type];
-        const block = { id: raw.id, type: raw.type, text: root.richTextToPlain(typeObj.rich_text), supported: true, dirty: false };
+        const block = { id: raw.id, type: raw.type, text: root.richTextToPlain(typeObj.rich_text), supported: true, dirty: false, hasChildren };
         if (raw.type === "to_do") block.checked = !!typeObj.checked;
         return block;
+    }
+
+    // Remonta a árvore buscada em blocksByParent numa lista única, na
+    // ordem em que apareceriam no Notion (cada bloco seguido dos seus
+    // próprios filhos), com `depth` pra indentação visual.
+    function flattenBlocks(parentId, depth) {
+        const children = root.blocksByParent[parentId] || [];
+        let result = [];
+        for (const block of children) {
+            result.push(Object.assign({}, block, { depth }));
+            if (block.hasChildren && root.blocksByParent[block.id]) {
+                result = result.concat(root.flattenBlocks(block.id, depth + 1));
+            }
+        }
+        return result;
     }
 
     function buildBlockPayload(block) {
@@ -105,6 +133,20 @@ Singleton {
         root.blocks = [];
         root.blocksReady = false;
         root.blocksError = false;
+        root.blocksByParent = {};
+        root.fetchQueue = [{ id, depth: 0 }];
+        root.processFetchQueue();
+    }
+
+    function processFetchQueue() {
+        if (root.currentFetchJob !== null) return;
+        if (root.fetchQueue.length === 0) {
+            root.blocks = root.flattenBlocks(root.openPageId, 0);
+            root.blocksReady = true;
+            return;
+        }
+        root.currentFetchJob = root.fetchQueue[0];
+        root.fetchQueue = root.fetchQueue.slice(1);
         blocksProc.running = true;
     }
 
@@ -113,10 +155,16 @@ Singleton {
         root.openPageId = "";
         root.openPageTitle = "";
         root.blocks = [];
+        root.fetchQueue = [];
+        root.blocksByParent = {};
     }
 
     function setBlockText(blockId, text) {
         root.blocks = root.blocks.map(b => b.id === blockId ? Object.assign({}, b, { text, dirty: true }) : b);
+    }
+
+    function toggleChecked(blockId) {
+        root.blocks = root.blocks.map(b => b.id === blockId ? Object.assign({}, b, { checked: !b.checked, dirty: true }) : b);
     }
 
     function saveBlock(block) {
@@ -160,8 +208,13 @@ Singleton {
             if (job.kind === "save") {
                 root.blocks = root.blocks.map(b => b.id === job.blockId ? Object.assign({}, b, { dirty: false }) : b);
             } else if (job.kind === "add") {
-                const created = (data.results || []).map(root.parseBlock);
+                // addBlock só acrescenta no nível raiz da página (ver função
+                // addBlock), por isso depth fixo em 0 aqui.
+                const created = (data.results || []).map(raw => Object.assign(root.parseBlock(raw), { depth: 0 }));
                 root.blocks = root.blocks.concat(created);
+                const parents = Object.assign({}, root.blocksByParent);
+                parents[root.openPageId] = (parents[root.openPageId] || []).concat(created);
+                root.blocksByParent = parents;
             }
             root.writeError = false;
         } catch (e) {
@@ -207,25 +260,38 @@ Singleton {
 
     Process {
         id: blocksProc
-        command: [
+        command: root.currentFetchJob ? [
             "curl", "-s", "--max-time", "10",
-            "-X", "GET", "https://api.notion.com/v1/blocks/" + root.openPageId + "/children?page_size=100",
+            "-X", "GET", "https://api.notion.com/v1/blocks/" + root.currentFetchJob.id + "/children?page_size=100",
             "-H", "Authorization: Bearer " + SecretsService.notionToken,
             "-H", "Notion-Version: 2022-06-28"
-        ]
+        ] : ["true"]
         stdout: StdioCollector {
             id: blocksCollector
             onStreamFinished: {
+                const job = root.currentFetchJob;
+                root.currentFetchJob = null;
                 try {
                     const data = JSON.parse(blocksCollector.text);
                     if (data.object === "error") throw new Error(data.message);
-                    root.blocks = (data.results || []).map(root.parseBlock);
-                    root.blocksReady = true;
-                    root.blocksError = false;
+                    const parsed = (data.results || []).map(root.parseBlock);
+                    const nextParents = Object.assign({}, root.blocksByParent);
+                    nextParents[job.id] = parsed;
+                    root.blocksByParent = nextParents;
+
+                    if (job.depth < root.maxFetchDepth) {
+                        const nested = parsed.filter(b => b.hasChildren).map(b => ({ id: b.id, depth: job.depth + 1 }));
+                        root.fetchQueue = root.fetchQueue.concat(nested);
+                    }
+                    if (job.depth === 0) root.blocksError = false;
                 } catch (e) {
-                    console.error("[NotionService] Falha ao buscar blocos:", e);
-                    root.blocksError = true;
+                    console.error("[NotionService] Falha ao buscar blocos de " + job.id + ":", e);
+                    // Falha num bloco aninhado só deixa aquele sub-nível sem
+                    // expandir (blocksByParent[job.id] fica ausente, flatten
+                    // ignora); só falha a página inteira se for o nível 0.
+                    if (job.depth === 0) root.blocksError = true;
                 }
+                root.processFetchQueue();
             }
         }
     }

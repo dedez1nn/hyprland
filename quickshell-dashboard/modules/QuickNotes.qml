@@ -24,6 +24,13 @@ Card {
     implicitWidth: root.baseWidth * root.sizeLevel
     implicitHeight: root.baseHeight * root.sizeLevel
 
+    // Fonte das notas (lista + blocos): cresce junto com o sizeLevel — sem
+    // isso, aumentar o card só dava mais espaço, sem deixar a letra maior.
+    // Mais grossa (Font.Medium) e mais branca que o texto padrão do
+    // dashboard (Appearance.colors.text é um azulado claro, não branco).
+    readonly property int noteFontSize: Appearance.font.sizeNormal + (root.sizeLevel - 1) * 2
+    readonly property color noteTextColor: "#f5f7ff"
+
     component ActionButton: Rectangle {
         id: btn
         required property string label
@@ -172,7 +179,9 @@ Card {
                         width: parent.width - 30
                         text: modelData.title
                         elide: Text.ElideRight
-                        font.pixelSize: Appearance.font.sizeSmall
+                        font.pixelSize: root.noteFontSize
+                        font.weight: Font.Medium
+                        color: root.noteTextColor
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -219,19 +228,44 @@ Card {
                 Repeater {
                     model: NotionService.blocksReady ? NotionService.blocks : []
 
-                    delegate: TextEdit {
+                    delegate: Row {
                         width: blocksColumn.width
-                        text: modelData.text
-                        readOnly: !root.editing || !modelData.supported
-                        color: modelData.supported ? Appearance.colors.text : Appearance.colors.textMuted
-                        font.family: Appearance.font.family
-                        font.pixelSize: Appearance.font.sizeSmall
-                        font.bold: modelData.type.startsWith("heading")
-                        wrapMode: TextEdit.Wrap
-                        selectByMouse: true
-                        onActiveFocusChanged: {
-                            if (!activeFocus && modelData.supported && text !== modelData.text) {
-                                NotionService.setBlockText(modelData.id, text);
+                        spacing: 6
+
+                        Item {
+                            width: modelData.depth * 16
+                            height: 1
+                        }
+
+                        StyledText {
+                            visible: modelData.type === "to_do"
+                            text: modelData.checked ? "☑" : "☐"
+                            font.pixelSize: root.noteFontSize
+                            color: modelData.checked ? Appearance.colors.success : root.noteTextColor
+
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled: root.editing
+                                cursorShape: root.editing ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                onClicked: NotionService.toggleChecked(modelData.id)
+                            }
+                        }
+
+                        TextEdit {
+                            width: Math.max(0, blocksColumn.width - modelData.depth * 16 - (modelData.type === "to_do" ? 30 : 6))
+                            text: modelData.text
+                            readOnly: !root.editing || !modelData.supported
+                            color: !modelData.supported ? Appearance.colors.textMuted : (modelData.checked ? Appearance.colors.textMuted : root.noteTextColor)
+                            font.family: Appearance.font.family
+                            font.pixelSize: root.noteFontSize
+                            font.weight: modelData.type.startsWith("heading") ? Font.Bold : Font.Medium
+                            font.strikeout: modelData.checked === true
+                            wrapMode: TextEdit.Wrap
+                            selectByMouse: true
+                            onActiveFocusChanged: {
+                                if (!activeFocus && modelData.supported && text !== modelData.text) {
+                                    NotionService.setBlockText(modelData.id, text);
+                                }
                             }
                         }
                     }
