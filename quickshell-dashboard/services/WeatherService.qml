@@ -152,7 +152,7 @@ Singleton {
     Process {
         id: weatherProc
         command: ["bash", "-c",
-            `curl -s --max-time 5 "https://api.open-meteo.com/v1/forecast?latitude=${root.latitude}&longitude=${root.longitude}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,is_day&hourly=visibility&daily=sunrise,sunset,precipitation_probability_max&forecast_days=1&timezone=auto"`
+            `curl -s --max-time 5 "https://api.open-meteo.com/v1/forecast?latitude=${root.latitude}&longitude=${root.longitude}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,is_day&hourly=visibility,precipitation_probability&daily=sunrise,sunset&forecast_days=1&timezone=auto"`
         ]
         stdout: StdioCollector {
             id: weatherCollector
@@ -170,7 +170,7 @@ Singleton {
                     const visibilityM = data.hourly?.visibility?.[currentHour] ?? 0;
                     root.visibilityKm = Math.round(visibilityM / 1000);
 
-                    root.rainChance = data.daily?.precipitation_probability_max?.[0] ?? 0;
+                    root.rainChance = data.hourly?.precipitation_probability?.[currentHour] ?? 0;
                     root.sunrise = root.formatDailyTime(data.daily?.sunrise?.[0]);
                     root.sunset = root.formatDailyTime(data.daily?.sunset?.[0]);
 

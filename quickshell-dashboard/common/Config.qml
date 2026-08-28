@@ -18,7 +18,7 @@ QtObject {
     }
 
     readonly property QtObject welcomeCard: QtObject {
-        property string greetingName: "Andre"
+        property string greetingName: "André"
         property int width: 320
     }
 
