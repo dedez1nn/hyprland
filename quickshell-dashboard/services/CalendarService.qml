@@ -19,6 +19,11 @@ Singleton {
     id: root
 
     property var events: []
+    // Todos os eventos parseados do feed, sem corte de "próximos 10" nem
+    // filtro de data — usado pela grade de mês navegável (ClockCalendar),
+    // que precisa achar eventos em meses passados/futuros além da janela
+    // de "próximos eventos" que `events` mantém.
+    property var allEvents: []
     property bool ready: false
     property bool error: false
     readonly property bool configured: SecretsService.protonCalendarIcsUrl.length > 0
@@ -116,10 +121,10 @@ Singleton {
             onStreamFinished: {
                 try {
                     const all = root.parseIcs(icsCollector.text);
+                    root.allEvents = all.slice().sort((a, b) => a.start - b.start);
                     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                    root.events = all
+                    root.events = root.allEvents
                         .filter(e => e.start >= cutoff)
-                        .sort((a, b) => a.start - b.start)
                         .slice(0, 10);
                     root.ready = true;
                     root.error = false;

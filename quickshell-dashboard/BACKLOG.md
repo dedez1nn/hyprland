@@ -29,9 +29,14 @@ Atualizar aqui sempre que surgir um pedido novo, antes de implementar.
 - [x] **Tira da semana corrente** — segunda a domingo, dia de hoje
       destacado, pontinho embaixo do dia que tem evento, mais a mensagem
       "N eventos essa semana" (`modules/ClockCalendar.qml`)
-- [ ] **Grade de mês navegável** — a tira acima só mostra a semana atual;
-      falta um calendário de verdade com navegação entre meses, se quiser
-      ir além disso
+- [x] **Grade de mês navegável** — ícone 📅 no canto superior direito
+      alterna entre a tira da semana e uma grade de mês de verdade (6
+      semanas, dias fora do mês em cinza), com "‹ mês ›" pra ir mês a mês
+      — cruzar dezembro/janeiro já muda o ano sozinho, sem seletor de ano
+      específico (`ClockCalendar.expanded`/`viewYear`/`viewMonth`).
+      Precisou expor `CalendarService.allEvents` (todos os eventos
+      parseados, sem o corte de "próximos 10") pra achar eventos em
+      meses passados/futuros fora da janela de "próximos eventos"
 - [ ] (limitação conhecida, não pedida — documentar) eventos recorrentes
       (RRULE) ainda não são expandidos, só a primeira ocorrência aparece
 

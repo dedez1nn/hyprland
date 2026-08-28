@@ -72,7 +72,8 @@ simulando o card esculpido do próprio fundo. Cores em
 - Relógio ao vivo (hora:minuto) e data por extenso em pt_BR, com capitalização corrigida manualmente (só a primeira letra — `toLocaleDateString` do Qt captura tudo em minúsculo).
 - Eventos do Proton Calendar: busca e parseia o link `.ics` público (Proton não tem API/CalDAV oficial pro Calendar — só Mail tem Bridge). Mostra até 4 próximos eventos, com estados de "não configurado", "carregando", "erro" e "sem eventos".
 - Limitações conhecidas do parser (`services/CalendarService.qml`): eventos recorrentes (RRULE) não são expandidos, só a primeira ocorrência aparece; horários com `TZID` são tratados como horário local direto, sem conversão de fuso (funciona bem pra eventos criados no fuso do próprio sistema).
-- Tira da semana corrente (segunda a domingo, hoje destacado, pontinho nos dias com evento) + mensagem "N eventos essa semana". Pendência: grade de mês navegável, ver `BACKLOG.md`.
+- Tira da semana corrente (segunda a domingo, hoje destacado, pontinho nos dias com evento) + mensagem "N eventos essa semana".
+- Ícone 📅 no canto superior direito alterna pra uma grade de mês navegável (6 semanas, dias de outro mês em cinza) com "‹ mês ›" — vai mês a mês, virando o ano sozinho ao cruzar dezembro/janeiro, sem seletor de ano específico. `CalendarService.allEvents` guarda todos os eventos parseados (sem o corte de "próximos 10" usado pela lista de próximos eventos) pra achar eventos em qualquer mês navegado.
 
 ### Clima (`modules/Weather.qml` + `services/WeatherService.qml`)
 - Geolocalização por IP (`ip-api.com`) + Open-Meteo (sem precisar de API key).
