@@ -74,9 +74,17 @@ else
 fi
 
 # ── configs ──────────────────────────────────────────────────────────────────
-for dir in waybar hypr kitty ghostty rofi swaync wlogout nwg-bar btop fastfetch wallust cava fish; do
+for dir in waybar hypr kitty ghostty rofi swaync wlogout nwg-bar btop fastfetch wallust cava fish \
+           autostart git qt5ct qt6ct quickshell swappy systemd Thunar wezterm; do
     install_config "$dir"
 done
+
+# ── arquivos soltos na raiz do .config ─────────────────────────────────────────
+if [ -f "$DOTFILES/.config/mimeapps.list" ]; then
+    backup_if_exists "$CONFIG/mimeapps.list"
+    cp "$DOTFILES/.config/mimeapps.list" "$CONFIG/mimeapps.list"
+    info "Installed mimeapps.list"
+fi
 
 # ── zshrc ────────────────────────────────────────────────────────────────────
 if [ -f "$DOTFILES/.zshrc" ]; then
@@ -109,6 +117,19 @@ find "$CONFIG/waybar" -name "*.sh" -exec chmod +x {} \;
 find "$CONFIG/hypr/UserScripts" -name "*.sh" -exec chmod +x {} \;
 find "$CONFIG/hypr/scripts" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 
+# ── systemd user units ────────────────────────────────────────────────────────
+if [ -d "$CONFIG/systemd/user" ]; then
+    systemctl --user daemon-reload 2>/dev/null || true
+    info "systemd --user daemon-reload executado"
+fi
+
+# ── quickshell-dashboard: aviso de path fixo no service ─────────────────────
+if [ "$DOTFILES" != "$HOME/repos/hyprland" ] && [ -f "$CONFIG/systemd/user/quickshell-dashboard.service" ]; then
+    warn "quickshell-dashboard.service aponta pra $HOME/repos/hyprland/quickshell-dashboard (fixo),"
+    warn "mas os dotfiles estão em $DOTFILES. Ajuste o ExecStart em"
+    warn "$CONFIG/systemd/user/quickshell-dashboard.service ou clone/mova o repo pra $HOME/repos/hyprland."
+fi
+
 # ── hyprpaper wallpaper path (usa fundo3.jpg por padrão) ────────────────────
 # Se o wallpaper padrão não existir, substitui pelo primeiro disponível
 DEFAULT_WALL="$WALLPAPERS_DIR/fundo3.jpg"
@@ -130,7 +151,11 @@ echo "  1. Instale as dependências listadas no README.md"
 echo "  2. Configure o widget de clima em:"
 echo "     ~/.config/hypr/UserScripts/Weather.py"
 echo "     (ajuste MANUAL_PLACE, MANUAL_LAT, MANUAL_LON)"
-echo "  3. Faça logout e entre novamente no Hyprland"
+echo "  3. (Opcional, SDDM) copie o tema de login manualmente:"
+echo "     sudo cp $DOTFILES/etc/sddm.conf /etc/sddm.conf"
+echo "  4. (Opcional) quickshell-dashboard: crie os segredos a partir do template"
+echo "     em quickshell-dashboard/config/secrets.example.json — veja o README lá"
+echo "  5. Faça logout e entre novamente no Hyprland"
 if [ -d "$backup_dir" ]; then
     echo ""
     warn "Configs anteriores salvas em: $backup_dir"

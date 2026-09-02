@@ -18,6 +18,9 @@ __pycache__/
 .config/hypr/wallpaper_effects/
 .config/hypr/.initial_startup_done
 
+# Estado do diálogo de arquivos do Qt (histórico de pastas navegadas, muda a cada uso)
+.config/QtProject.conf
+
 # Quickshell state
 .config/quickshell/GlobalStates.qml
 

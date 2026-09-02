@@ -28,9 +28,14 @@ Escolha o caminho de instalação:
 Se você já tem o setup do JaKooLit rodando, você só precisa sobrescrever os arquivos que foram customizados aqui. Sem instalar dependências extras.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/dotfiles
-cd ~/dotfiles
+git clone git@github.com:dedez1nn/hyprland.git ~/repos/hyprland
+cd ~/repos/hyprland
 ```
+
+> O caminho `~/repos/hyprland` não é só convenção: o serviço systemd do
+> `quickshell-dashboard` (`.config/systemd/user/quickshell-dashboard.service`)
+> aponta pra `%h/repos/hyprland/quickshell-dashboard` de forma fixa. Clonando
+> em outro lugar, ajuste o `ExecStart` desse arquivo.
 
 ### 1. Waybar — layout e estilo
 
@@ -107,6 +112,29 @@ cp -r .config/wlogout/. ~/.config/wlogout/
 
 # btop
 cp .config/btop/btop.conf ~/.config/btop/btop.conf
+
+# Theming Qt (qt5ct/qt6ct)
+cp -r .config/qt5ct/. ~/.config/qt5ct/
+cp -r .config/qt6ct/. ~/.config/qt6ct/
+
+# Thunar (atalhos e ações customizadas)
+cp -r .config/Thunar/. ~/.config/Thunar/
+
+# Wezterm (terminal alternativo)
+cp .config/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
+
+# Apps de autostart (keyring, Proton Mail Bridge, boas-vindas do CachyOS)
+cp -r .config/autostart/. ~/.config/autostart/
+
+# Aplicativos padrão do sistema
+cp .config/mimeapps.list ~/.config/mimeapps.list
+
+# Módulo overview do Quickshell + tema Material
+cp -r .config/quickshell/. ~/.config/quickshell/
+
+# Serviços de usuário do systemd (autostart do quickshell-dashboard)
+cp -r .config/systemd/. ~/.config/systemd/
+systemctl --user daemon-reload
 ```
 
 Reinicie a Waybar: `pkill waybar && waybar &`
@@ -129,6 +157,15 @@ sudo pacman -S kitty ghostty rofi-wayland thunar
 
 # Menu de saída e barra de sessão
 sudo pacman -S wlogout nwg-bar
+
+# Quickshell (overview de janelas + quickshell-dashboard)
+yay -S quickshell-git
+
+# Theming Qt, agente polkit, applets de bandeja
+sudo pacman -S qt5ct qt6ct hyprpolkitagent network-manager-applet blueman
+
+# playerctl (mini player MPRIS do quickshell-dashboard)
+sudo pacman -S playerctl
 
 # Wallpaper daemon
 # Opção A — pacman:
@@ -213,6 +250,40 @@ O ícone  na Waybar abre a TUI de revisão de emails do projeto [proton-api](../
 
 O widget detecta o estado da VPN via `protonvpn status`. Requer o [ProtonVPN CLI](https://protonvpn.com/support/linux-vpn-tool/) instalado e autenticado (`protonvpn signin`).
 
+### Quickshell Dashboard
+
+Widgets extras (boas-vindas, calendário, clima, mini player, notas do Notion)
+que aparecem quando o workspace focado está vazio. Roda como serviço systemd
+apontando direto pro caminho do repo — **precisa que o repo esteja em
+`~/repos/hyprland`** (ver nota na seção de clone acima). Configuração de
+segredos (token Notion, link `.ics` do Proton Calendar) e detalhes completos
+estão no [README próprio](quickshell-dashboard/README.md).
+
+```bash
+cp quickshell-dashboard/config/secrets.example.json quickshell-dashboard/config/secrets.json
+# edite secrets.json com seus valores
+systemctl --user daemon-reload
+systemctl --user restart quickshell-dashboard.service
+```
+
+### SDDM (tela de login)
+
+`etc/sddm.conf` configura autologin e o tema `simple_sddm_2`. Não é copiado
+pelo `install.sh` (exige `sudo` e mexe fora de `$HOME`) — copie manualmente
+se usar SDDM:
+
+```bash
+sudo cp etc/sddm.conf /etc/sddm.conf
+```
+
+Ajuste `[Autologin] User=` para o seu usuário antes de copiar.
+
+### Problemas conhecidos
+
+A pasta [`troubleshooting/`](troubleshooting/) tem notas de incidentes já
+resolvidos neste setup (Proton Bridge não abre, migração de keyring,
+loop no `protonvpn signin`) — vale conferir antes de investigar do zero.
+
 ---
 
 ## Atalhos principais
@@ -256,10 +327,14 @@ O widget detecta o estado da VPN via `protonvpn status`. Requer o [ProtonVPN CLI
 ## Estrutura
 
 ```
-dotfiles/
+hyprland/                       ← clonar em ~/repos/hyprland (ver nota acima)
 ├── install.sh                  ← instalador principal
 ├── wallpapers/                 ← fundos de tela
 ├── .zshrc                      ← config do zsh
+├── etc/
+│   └── sddm.conf                ← tela de login (copiar manualmente, precisa sudo)
+├── troubleshooting/             ← notas de incidentes já resolvidos (Proton Bridge, keyring, VPN)
+├── quickshell-dashboard/        ← widgets de área de trabalho vazia (README próprio)
 └── .config/
     ├── hypr/
     │   ├── hyprland.conf
@@ -273,14 +348,25 @@ dotfiles/
     │   ├── style/              ← temas CSS
     │   ├── UserModules         ← módulos próprios
     │   └── *.sh                ← scripts dos módulos
+    ├── quickshell/              ← overview de janelas (qs -c overview)
     ├── kitty/
     ├── ghostty/
+    ├── wezterm/
     ├── rofi/
     ├── swaync/
     ├── wlogout/
     ├── nwg-bar/
     ├── btop/
     ├── fastfetch/
+    ├── cava/
+    ├── fish/
+    ├── qt5ct/ qt6ct/           ← theming de apps Qt
+    ├── Thunar/
+    ├── autostart/               ← keyring, Proton Mail Bridge etc
+    ├── systemd/user/            ← serviço do quickshell-dashboard, rclone (pessoal)
+    ├── git/                     ← gitignore global
+    ├── swappy/
+    ├── mimeapps.list
     └── wallust/
 ```
 
