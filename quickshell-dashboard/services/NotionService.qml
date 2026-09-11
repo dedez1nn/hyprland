@@ -231,6 +231,18 @@ Singleton {
         function onNotionTokenChanged() { if (root.configured) root.search() }
     }
 
+    // Retry periódico: cobre a busca inicial falhando por rede/DNS ainda não
+    // prontos (ex: unit do systemd subindo antes da rede) ou qualquer outra
+    // falha transitória da API. Sem isso, listError ficava travado pra
+    // sempre, já que search() só roda de novo manualmente ou quando o token
+    // muda.
+    Timer {
+        interval: 5 * 60 * 1000
+        running: true
+        repeat: true
+        onTriggered: if (root.configured && root.listError) root.search()
+    }
+
     Process {
         id: searchProc
         command: [
