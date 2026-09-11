@@ -4,5 +4,11 @@ config/secrets.json
 # Posição dos widgets arrastados — específico da tela/resolução atual.
 config/positions.json
 
+# Tamanho dos widgets redimensionados pelas alças do Card — mesmo motivo.
+config/sizes.json
+
+# Widgets ligados/desligados pelo WidgetsMenu — mesmo motivo.
+config/widget-visibility.json
+
 # Contador de tempo ativo — estado efêmero, atrelado ao boot atual.
 config/active-time.json

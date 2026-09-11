@@ -4,3 +4,8 @@ Weather 1.0 Weather.qml
 MusicPlayer 1.0 MusicPlayer.qml
 DashboardWindow 1.0 DashboardWindow.qml
 QuickNotes 1.0 QuickNotes.qml
+WidgetsMenu 1.0 WidgetsMenu.qml
+EntropyWidget 1.0 EntropyWidget.qml
+KernelTaintWidget 1.0 KernelTaintWidget.qml
+BootStatusWidget 1.0 BootStatusWidget.qml
+SystemdBootTimeWidget 1.0 SystemdBootTimeWidget.qml

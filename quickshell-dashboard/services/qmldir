@@ -8,4 +8,8 @@ singleton HyprlandWorkspaceService 1.0 HyprlandWorkspaceService.qml
 singleton ActiveTimeService 1.0 ActiveTimeService.qml
 singleton CommitStreakService 1.0 CommitStreakService.qml
 singleton WidgetPositionService 1.0 WidgetPositionService.qml
+singleton WidgetSizeService 1.0 WidgetSizeService.qml
+singleton WidgetVisibilityService 1.0 WidgetVisibilityService.qml
+singleton BootSessionService 1.0 BootSessionService.qml
+singleton BootDiagnosticsService 1.0 BootDiagnosticsService.qml
 singleton NotionService 1.0 NotionService.qml

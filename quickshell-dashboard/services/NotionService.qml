@@ -8,7 +8,8 @@ import Quickshell.Io
  * Integração com a API do Notion: lista tudo que a integração enxerga
  * (POST /v1/search, cobre páginas e databases compartilhadas com ela, não
  * uma database fixa) e permite abrir uma página pra ler/editar o texto
- * dos blocos de primeiro nível.
+ * dos blocos de primeiro nível, além de criar blocos novos (ver
+ * creatableBlockTypes, usado pelo menu "Novo" do QuickNotes).
  *
  * Importante: todo `curl` aqui vai como lista de argv no `command` do
  * `Process`, nunca como string `bash -c` concatenada — o texto dos blocos
@@ -39,6 +40,22 @@ Singleton {
     readonly property bool configured: SecretsService.notionToken.length > 0
     readonly property var supportedBlockTypes: ["paragraph", "heading_1", "heading_2", "heading_3", "bulleted_list_item", "numbered_list_item", "to_do"]
     readonly property int maxFetchDepth: 4
+
+    // Tipos que o botão "Novo" do QuickNotes oferece, na ordem em que
+    // aparecem no menu — mesmo texto usado no seletor "/" do Notion.
+    // "table" fica listado desabilitado ("em breve"): bloco de tabela é
+    // uma estrutura aninhada (table + table_row com células), fora do
+    // escopo do MVP de blocos de texto simples acima.
+    readonly property var creatableBlockTypes: [
+        { type: "paragraph", label: "Texto" },
+        { type: "heading_1", label: "Título 1" },
+        { type: "heading_2", label: "Título 2" },
+        { type: "heading_3", label: "Título 3" },
+        { type: "bulleted_list_item", label: "Lista" },
+        { type: "numbered_list_item", label: "Lista numerada" },
+        { type: "to_do", label: "Tarefa" },
+        { type: "table", label: "Tabela (em breve)", disabled: true }
+    ]
 
     // Navegação: "list" (busca) ou "detail" (blocos de uma página aberta)
     property string view: "list"
@@ -116,7 +133,7 @@ Singleton {
     }
 
     function buildBlockPayload(block) {
-        const payload = { rich_text: [{ type: "text", text: { content: block.text } }] };
+        const payload = { rich_text: block.text.length > 0 ? [{ type: "text", text: { content: block.text } }] : [] };
         if (block.type === "to_do") payload.checked = !!block.checked;
         return { [block.type]: payload };
     }
@@ -182,12 +199,15 @@ Singleton {
         root.blocks.filter(b => b.dirty && b.supported).forEach(b => root.saveBlock(b));
     }
 
-    function addBlock(text) {
-        if (!root.openPageId) return;
+    // type é um dos supportedBlockTypes (ver creatableBlockTypes pro menu
+    // "Novo" do QuickNotes); reaproveita buildBlockPayload, então um
+    // to_do novo já nasce com checked: false.
+    function addBlock(type, text) {
+        if (!root.openPageId || !root.supportedBlockTypes.includes(type)) return;
         root.writeQueue = root.writeQueue.concat([{
             kind: "add",
             url: "https://api.notion.com/v1/blocks/" + root.openPageId + "/children",
-            body: JSON.stringify({ children: [{ paragraph: { rich_text: text.length > 0 ? [{ type: "text", text: { content: text } }] : [] } }] })
+            body: JSON.stringify({ children: [root.buildBlockPayload({ type, text, checked: false })] })
         }]);
         root.processQueue();
     }
