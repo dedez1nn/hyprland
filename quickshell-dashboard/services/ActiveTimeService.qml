@@ -6,14 +6,16 @@ import Quickshell.Io
 import Quickshell.Wayland
 
 /**
- * Tempo de atividade NA SESSÃO — diferente do UptimeService (uptime do
+ * Tempo de atividade DO DIA — diferente do UptimeService (uptime do
  * sistema): conta só os segundos em que o usuário não estava ocioso, via
- * protocolo ext-idle-notify (IdleMonitor, nativo do Quickshell). Zera
- * quando o boot muda (login novo). Persistido em config/active-time.json
- * a cada poucos segundos pra sobreviver a um restart do processo qs
- * (ex: crash no resume de suspend) sem perder a contagem da sessão —
- * o arquivo guarda o boot_id junto pra distinguir "mesmo boot, processo
- * reiniciou" de "boot novo, sessão nova".
+ * protocolo ext-idle-notify (IdleMonitor, nativo do Quickshell). Acumula
+ * o dia civil inteiro e só zera na virada do dia — sobrevive a
+ * desligamentos, suspensões e restarts do processo qs (ex: crash no
+ * resume de suspend), no mesmo espírito do UptimeToday.sh
+ * (~/.config/hypr/scripts), que usa o mesmo critério de "data salva vs.
+ * data atual" em vez de boot_id (boot_id muda a cada desligamento e
+ * zerava o contador à toa). Persistido em config/active-time.json a cada
+ * poucos segundos.
  */
 Singleton {
     id: root
@@ -22,7 +24,7 @@ Singleton {
     readonly property int saveIntervalSeconds: 10
     property int activeSeconds: 0
     property string prettyText: "00h 00m"
-    property string bootId: ""
+    property string today: root.currentDate()
     property bool restored: false
 
     function format(totalSeconds) {
@@ -31,9 +33,13 @@ Singleton {
         return `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m`;
     }
 
+    function currentDate() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
     function save() {
-        if (!root.bootId) return;
-        stateFile.setText(JSON.stringify({ bootId: root.bootId, activeSeconds: root.activeSeconds }));
+        stateFile.setText(JSON.stringify({ date: root.today, activeSeconds: root.activeSeconds }));
     }
 
     onActiveSecondsChanged: root.prettyText = root.format(root.activeSeconds)
@@ -48,7 +54,14 @@ Singleton {
         interval: 1000
         running: !idleMonitor.isIdle
         repeat: true
-        onTriggered: root.activeSeconds += 1
+        onTriggered: {
+            const day = root.currentDate();
+            if (day !== root.today) {
+                root.today = day;
+                root.activeSeconds = 0;
+            }
+            root.activeSeconds += 1;
+        }
     }
 
     Timer {
@@ -67,27 +80,14 @@ Singleton {
         }
     }
 
-    Process {
-        id: bootIdProc
-        command: ["cat", "/proc/sys/kernel/random/boot_id"]
-        stdout: StdioCollector {
-            id: bootIdCollector
-            onStreamFinished: {
-                root.bootId = bootIdCollector.text.trim();
-                stateFile.reload();
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
     FileView {
         id: stateFile
         path: Qt.resolvedUrl("../config/active-time.json")
         onLoadedChanged: {
-            if (root.restored || !root.bootId) return;
+            if (root.restored) return;
             try {
                 const data = JSON.parse(stateFile.text());
-                if (data.bootId === root.bootId) root.activeSeconds = data.activeSeconds || 0;
+                if (data.date === root.today) root.activeSeconds = data.activeSeconds || 0;
             } catch (e) {
                 // arquivo ausente/corrompido — começa do zero
             }
