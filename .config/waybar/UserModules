@@ -51,6 +51,23 @@
     "on-click": "$HOME/.config/hypr/UserScripts/KeybindSheet.sh",
     "tooltip": true,
     "tooltip-format": "Atalhos do teclado"
+},
+
+"image#storage": {
+    "exec": "$HOME/.config/waybar/storage-ring.sh",
+    "interval": 30,
+    "size": 22,
+    "tooltip": true,
+    "tooltip-format": "Armazenamento",
+    "on-click": "notify-send 'Armazenamento' \"$(df -h /home | awk 'NR==2 {print $3\" usados de \"$2\" (\"$5\")\"}')\""
+},
+
+"custom/headphone_volume": {
+    "exec-if": "$HOME/.config/waybar/headphone-volume.sh --check",
+    "exec": "$HOME/.config/waybar/headphone-volume.sh",
+    "return-type": "json",
+    "interval": 2,
+    "tooltip": true
 }
 
 }
