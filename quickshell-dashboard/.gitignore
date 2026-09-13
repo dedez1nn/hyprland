@@ -12,3 +12,6 @@ config/widget-visibility.json
 
 # Contador de tempo ativo — estado efêmero, atrelado ao boot atual.
 config/active-time.json
+
+# Suspensão automática ligada/desligada pelo IdleSuspendWidget, mesmo motivo do widget-visibility.json.
+config/idle-suspend.json

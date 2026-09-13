@@ -62,6 +62,8 @@ PanelWindow {
         Region { item: musicPlayer }
         Region { item: weather }
         Region { item: quickNotes }
+        Region { item: networkConnections }
+        Region { item: idleSuspend }
         Region { item: widgetsMenu }
         Region { item: entropyWidget }
         Region { item: kernelTaintWidget }
@@ -104,6 +106,20 @@ PanelWindow {
         visible: WidgetVisibilityService.isEnabled("quickNotes")
         x: WidgetPositionService.get(positionKey)?.x ?? Config.position.margin
         y: WidgetPositionService.get(positionKey)?.y ?? (root.height - height - Config.position.margin)
+    }
+
+    NetworkConnectionsWidget {
+        id: networkConnections
+        visible: WidgetVisibilityService.isEnabled("networkConnections")
+        x: WidgetPositionService.get(positionKey)?.x ?? Config.position.margin
+        y: WidgetPositionService.get(positionKey)?.y ?? Config.position.margin
+    }
+
+    IdleSuspendWidget {
+        id: idleSuspend
+        visible: WidgetVisibilityService.isEnabled("idleSuspend")
+        x: WidgetPositionService.get(positionKey)?.x ?? (root.width - width - Config.position.margin)
+        y: WidgetPositionService.get(positionKey)?.y ?? (Config.position.margin + 60)
     }
 
     // Não é um Card: fixo, sem drag/resize/positionKey — sempre no topo

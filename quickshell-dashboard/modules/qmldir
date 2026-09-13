@@ -9,3 +9,5 @@ EntropyWidget 1.0 EntropyWidget.qml
 KernelTaintWidget 1.0 KernelTaintWidget.qml
 BootStatusWidget 1.0 BootStatusWidget.qml
 SystemdBootTimeWidget 1.0 SystemdBootTimeWidget.qml
+NetworkConnectionsWidget 1.0 NetworkConnectionsWidget.qml
+IdleSuspendWidget 1.0 IdleSuspendWidget.qml
