@@ -11,3 +11,4 @@ BootStatusWidget 1.0 BootStatusWidget.qml
 SystemdBootTimeWidget 1.0 SystemdBootTimeWidget.qml
 NetworkConnectionsWidget 1.0 NetworkConnectionsWidget.qml
 IdleSuspendWidget 1.0 IdleSuspendWidget.qml
+SpeedTestWidget 1.0 SpeedTestWidget.qml

@@ -23,3 +23,6 @@ config/network-history.json
 # network-allowlist.example.json e ajuste; sem ele, o critério de allowlist
 # do widget fica desligado (ver NetworkConnectionsService.allowlistConfigured).
 config/network-allowlist.json
+
+# Último resultado do SpeedTestWidget — estado efêmero, não faz sentido versionar.
+config/speedtest-last.json

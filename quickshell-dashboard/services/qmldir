@@ -15,3 +15,4 @@ singleton BootDiagnosticsService 1.0 BootDiagnosticsService.qml
 singleton NotionService 1.0 NotionService.qml
 singleton NetworkConnectionsService 1.0 NetworkConnectionsService.qml
 singleton IdleSuspendService 1.0 IdleSuspendService.qml
+singleton SpeedTestService 1.0 SpeedTestService.qml

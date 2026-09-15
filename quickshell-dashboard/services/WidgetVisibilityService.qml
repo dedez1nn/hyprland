@@ -29,6 +29,7 @@ Singleton {
         { key: "quickNotes", label: "Notion", defaultEnabled: true },
         { key: "networkConnections", label: "Conexões de rede", defaultEnabled: true },
         { key: "idleSuspend", label: "Suspensão automática", defaultEnabled: true },
+        { key: "speedTest", label: "Teste de velocidade", defaultEnabled: true },
         { key: "entropy", label: "Entropia do sistema", defaultEnabled: true, group: "Diagnóstico de boot" },
         { key: "kernelTaint", label: "Saúde do kernel", defaultEnabled: true, group: "Diagnóstico de boot" },
         { key: "bootStatus", label: "Status do boot", defaultEnabled: true, group: "Diagnóstico de boot" },

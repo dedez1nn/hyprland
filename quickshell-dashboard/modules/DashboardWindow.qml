@@ -64,6 +64,7 @@ PanelWindow {
         Region { item: quickNotes }
         Region { item: networkConnections }
         Region { item: idleSuspend }
+        Region { item: speedTest }
         Region { item: widgetsMenu }
         Region { item: entropyWidget }
         Region { item: kernelTaintWidget }
@@ -120,6 +121,13 @@ PanelWindow {
         visible: WidgetVisibilityService.isEnabled("idleSuspend")
         x: WidgetPositionService.get(positionKey)?.x ?? (root.width - width - Config.position.margin)
         y: WidgetPositionService.get(positionKey)?.y ?? (Config.position.margin + 60)
+    }
+
+    SpeedTestWidget {
+        id: speedTest
+        visible: WidgetVisibilityService.isEnabled("speedTest")
+        x: WidgetPositionService.get(positionKey)?.x ?? (root.width - width - Config.position.margin)
+        y: WidgetPositionService.get(positionKey)?.y ?? (idleSuspend.y + idleSuspend.height + 20)
     }
 
     // Não é um Card: fixo, sem drag/resize/positionKey — sempre no topo
