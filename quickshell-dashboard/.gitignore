@@ -15,3 +15,11 @@ config/active-time.json
 
 # Suspensão automática ligada/desligada pelo IdleSuspendWidget, mesmo motivo do widget-visibility.json.
 config/idle-suspend.json
+
+# Histórico de hosts remotos recorrentes do NetworkConnectionsWidget, mesmo motivo do sizes.json.
+config/network-history.json
+
+# Lista pessoal de processos confiáveis do NetworkConnectionsWidget. Copie de
+# network-allowlist.example.json e ajuste; sem ele, o critério de allowlist
+# do widget fica desligado (ver NetworkConnectionsService.allowlistConfigured).
+config/network-allowlist.json

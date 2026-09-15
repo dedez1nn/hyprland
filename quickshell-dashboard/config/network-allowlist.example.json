@@ -1,0 +1,11 @@
+{
+  "processes": [
+    "firefox",
+    "chromium",
+    "steam",
+    "discord",
+    "spotify",
+    "code",
+    "ssh"
+  ]
+}
